@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Canvas from "./Components/Canvas/Canvas";
 
-import baseImage from "./juliaNoBar.jpg";
+import baseImage from "./baseImage.jpg";
 
 import "./App.css";
 
@@ -17,7 +17,6 @@ function App() {
 
   img.onload = () => {
     baseContext!.drawImage(img, 0, 0, 2480, 3508);
-    console.log(baseContext);
     setIsImageLoaded(true);
   };
 
