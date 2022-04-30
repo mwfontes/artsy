@@ -5,6 +5,7 @@ import "./Canvas.css";
 interface Props {
   width: number;
   height: number;
+  baseContext: CanvasRenderingContext2D;
 }
 
 type RotationFunction = (deg: number) => number;
@@ -28,8 +29,8 @@ type Node = {
   xRotationFunction: RotationFunction;
 };
 
-const getColorValue = (base = 128, variation = 32): number => {
-  return 200 - Math.random() * 32 * (Math.floor(Math.random() * 2) || -1);
+const getBasePixelData = (x: number, y: number, baseContext: CanvasRenderingContext2D) => {
+  return baseContext.getImageData(x, y, 1, 1).data;
 };
 
 const getIsOutOfBoundsOrFamilyOver = (node: Node, width: number, height: number): boolean => {
@@ -67,10 +68,13 @@ const getXRotationFunction = (): RotationFunction => {
   return Math.cos;
 };
 
-const getNewNode = (width: number, height: number, node?: Node): Node => {
+const getNewNode = (baseContext: CanvasRenderingContext2D, width: number, height: number, node?: Node): Node => {
+  const newX = Math.floor(Math.random() * width);
+  const newY = Math.floor(Math.random() * height);
+
   return {
-    x: node?.x || Math.floor(Math.random() * width),
-    y: node?.y || Math.floor(Math.random() * height),
+    x: node?.x || newX,
+    y: node?.y || newY,
     deg: Math.random() * 2 * Math.PI,
     step: 0,
     directionMultiplierX: Math.floor(Math.random() * 2) || -1, // -1 or 1
@@ -78,29 +82,29 @@ const getNewNode = (width: number, height: number, node?: Node): Node => {
     speedRatio: Math.random(),
     lineStepLimit: Math.random() * 300,
     descendant: node?.descendant || 0,
-    lineWidth: node?.lineWidth || Math.random() * 88 + 40,
+    lineWidth: node?.lineWidth || Math.random() * 20 + 20,
     color: {
-      r: node?.color.r || getColorValue(),
-      g: node?.color.g || 100, // getColorValue(100, 24),
-      b: node?.color.b || 100, // getColorValue(),
+      r: node?.color.r || getBasePixelData(node?.x || newX, node?.y || newY, baseContext)[0],
+      g: node?.color.g || getBasePixelData(node?.x || newX, node?.y || newY, baseContext)[1],
+      b: node?.color.b || getBasePixelData(node?.x || newX, node?.y || newY, baseContext)[2],
     },
     xRotationFunction: node?.xRotationFunction || getXRotationFunction(),
   };
 };
 
-function Canvas({ width, height }: Props) {
+function Canvas({ width, height, baseContext }: Props) {
   const canvas = createRef<HTMLCanvasElement>();
   const animationFrame = useRef<any>();
   const ctx = useRef<CanvasRenderingContext2D>();
   const screenRatio = width > height ? height / width : width / height;
   const [isRunning, setIsRunning] = useState<boolean>(true);
-  const nodes = useRef<Node[]>([getNewNode(width, height)]);
+  const nodes = useRef<Node[]>([getNewNode(baseContext, width, height)]);
   const maxBlockNodes = 20;
   const blockNodeInterval = 3;
 
   const paint = useCallback(() => {
     if (!nodes.current.length) {
-      nodes.current = [getNewNode(width, height)];
+      nodes.current = [getNewNode(baseContext, width, height)];
       animationFrame.current = window.requestAnimationFrame(paint);
       return;
     }
@@ -110,7 +114,6 @@ function Canvas({ width, height }: Props) {
         x,
         y,
         deg,
-        color: { r, g, b },
         step: currentStep,
         speedRatio,
         lineStepLimit,
@@ -141,42 +144,51 @@ function Canvas({ width, height }: Props) {
         if (node.step >= lineStepLimit) {
           for (let i = 0; i < (node.descendant + 1) * 2; i++) {
             nodes.current.push(
-              getNewNode(width, height, {
+              getNewNode(baseContext, width, height, {
                 ...node,
                 descendant: node.descendant + 1,
                 lineWidth: node.lineWidth / 2,
                 color: {
-                  r: node.color.r - 10,
-                  g: node.color.g - 10,
-                  b: node.color.b - 10,
+                  r: getBasePixelData(node.x, node.y, baseContext)[0],
+                  g: getBasePixelData(node.x, node.y, baseContext)[1],
+                  b: getBasePixelData(node.x, node.y, baseContext)[2],
                 },
+                //   r: node.color.r - 10,
+                //   g: node.color.g - 10,
+                //   b: node.color.b - 10,
+                // },
               })
             );
           }
           nodes.current.splice(i, 1);
         }
 
+        const currentColor = getBasePixelData(node.x, node.y, baseContext);
+
         // Paints on canvas
         ctx.current.beginPath();
         ctx.current.moveTo(x, y);
         ctx.current.lineTo(node.x, node.y);
-        ctx.current.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.current.strokeStyle = `rgb(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]})`;
         ctx.current.lineWidth = lineWidth;
         ctx.current.lineCap = "round";
         ctx.current.stroke();
 
         // Adds initial transparent blocks
-        const correctedBlockNodeInterval = Math.floor(lineWidth / stepSize * blockNodeInterval);
-        if (currentStep <= maxBlockNodes * correctedBlockNodeInterval && currentStep % correctedBlockNodeInterval === 0) {
-          const opacity = (maxBlockNodes - (currentStep / blockNodeInterval)) / maxBlockNodes;
-          ctx.current.strokeStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        const correctedBlockNodeInterval = Math.floor((lineWidth / stepSize) * blockNodeInterval);
+        if (
+          currentStep <= maxBlockNodes * correctedBlockNodeInterval &&
+          currentStep % correctedBlockNodeInterval === 0
+        ) {
+          const opacity = (maxBlockNodes - currentStep / blockNodeInterval) / maxBlockNodes;
+          ctx.current.strokeStyle = `rgba(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]}, ${opacity})`;
           ctx.current.lineWidth = lineWidth / 4;
-          ctx.current.strokeRect(x - (lineWidth * 2), y - (lineWidth * 2), lineWidth * 4, lineWidth * 4);
+          ctx.current.strokeRect(x - lineWidth * 2, y - lineWidth * 2, lineWidth * 4, lineWidth * 4);
         }
       }
     });
     animationFrame.current = window.requestAnimationFrame(paint);
-  }, [screenRatio, width, height]);
+  }, [screenRatio, width, height, baseContext]);
 
   window.addEventListener("keyup", (e) => {
     if (e.key === "Escape") {
