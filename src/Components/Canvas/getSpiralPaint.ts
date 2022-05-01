@@ -13,7 +13,7 @@ interface ISpiralPaint {
 }
 
 export const getSpiralPaint = ({ baseContext, paintContext, width, height, screenRatio, families }: ISpiralPaint) => {
-  const initialLineWidth = 100;
+  const initialLineWidth = 20;
   const nodes = [getNewSpiralNode({ baseContext, width, height, lineWidth: initialLineWidth })];
   const maxBlockNodes = 20;
   const blockNodeInterval = 3;

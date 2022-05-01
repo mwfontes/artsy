@@ -10,8 +10,8 @@ interface ILinePaint {
 }
 
 export const getLinePaint = ({ baseContext, paintContext, width, height, families }: ILinePaint) => {
-  const lineWidth = 50;
-  const lineSegmentsSteps = 30;
+  const lineWidth = 4;
+  const lineSegmentsSteps = 10;
   let currentFamily = 0;
   let node: TLineNode = getNewLineNode({ width, height });
 
@@ -22,13 +22,21 @@ export const getLinePaint = ({ baseContext, paintContext, width, height, familie
       const xSegment = (destinationX - originX) / lineSegmentsSteps;
       const ySegment = (destinationY - originY) / lineSegmentsSteps;
 
+      const originColor = getBasePixelData(originX, originY, baseContext);
+      const destinationColor = getBasePixelData(destinationX, destinationY, baseContext);
+
       for (let i = 0; i < lineSegmentsSteps; i++) {
-        const segmentColor = getBasePixelData(originX + xSegment * i, originY + ySegment * i, baseContext);
+
+        const segmentColor = {
+          r: Math.round(originColor[0] + ((destinationColor[0] - originColor[0]) / lineSegmentsSteps) * i),
+          g: Math.round(originColor[1] + ((destinationColor[1] - originColor[1]) / lineSegmentsSteps) * i),
+          b: Math.round(originColor[2] + ((destinationColor[2] - originColor[2]) / lineSegmentsSteps) * i),
+        };
 
         paintContext.beginPath();
         paintContext.moveTo(originX + xSegment * i, originY + ySegment * i);
         paintContext.lineTo(originX + xSegment * (i + 1), originY + ySegment * (i + 1));
-        paintContext.strokeStyle = `rgba(${segmentColor[0]}, ${segmentColor[1]}, ${segmentColor[2]}, 1)`;
+        paintContext.strokeStyle = `rgba(${segmentColor.r}, ${segmentColor.g}, ${segmentColor.b}, 0.25)`;
         paintContext.lineWidth = lineWidth;
         paintContext.lineCap = "round";
         paintContext.stroke();
@@ -37,5 +45,5 @@ export const getLinePaint = ({ baseContext, paintContext, width, height, familie
 
     node = getNewLineNode({ width, height, originX: destinationX, originY: destinationY });
     currentFamily++;
-  } while (currentFamily <= families * 40);
+  } while (currentFamily <= families * 50);
 };

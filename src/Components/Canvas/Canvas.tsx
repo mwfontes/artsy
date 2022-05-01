@@ -10,7 +10,7 @@ export interface ICanvas {
   width: number;
   height: number;
   baseContext: CanvasRenderingContext2D;
-  type: 'spiral' | 'line';
+  type: 'spiral' | 'line' | 'hybrid';
 }
 
 function Canvas({ families, width, height, baseContext, type }: ICanvas) {
@@ -38,6 +38,23 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
             baseContext: baseContext!,
             paintContext: ctx.current!,
             families,
+            width,
+            height,
+          });
+        }
+        if (type === "hybrid") {
+          getLinePaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families: families / 2,
+            width,
+            height,
+          });
+          getSpiralPaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families: families / 2,
+            screenRatio,
             width,
             height,
           });

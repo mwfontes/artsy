@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Canvas from "./Components/Canvas/Canvas";
 
-import baseImage from "./images/image.jpg";
+import baseImage from "./images/lugano.jpg";
 
 import "./App.css";
 
@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div className='App'>
-      <Canvas width={2480} height={3508} baseContext={baseContext!} families={50} type="line" />
+      <Canvas width={2480} height={3508} baseContext={baseContext!} families={200} type="hybrid" />
     </div>
   );
 }
