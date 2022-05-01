@@ -1,6 +1,13 @@
-import {TNode} from '../types';
+import { TSpiralNode } from "../Components/Canvas/getNewSpiralNode";
+import { TLineNode } from "../Components/Canvas/getNewLineNode";
 
-export const getIsOutOfBounds = (node: TNode, width: number, height: number): boolean => {
+interface IGetIsOutOfBounds {
+  node: TSpiralNode | TLineNode;
+  width: number;
+  height: number;
+}
+
+export const getIsOutOfBounds = ({ node, width, height }: IGetIsOutOfBounds): boolean => {
   // Out of bounds
   if (node.x > width) {
     return true;

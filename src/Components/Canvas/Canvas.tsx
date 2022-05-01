@@ -1,11 +1,19 @@
 import React, { createRef, useRef, useEffect } from "react";
 
-import { ICanvas } from "../../types";
 import { getSpiralPaint } from "./getSpiralPaint";
+import {getLinePaint} from "./getLinePaint";
 
 import "./Canvas.css";
 
-function Canvas({ families, width, height, baseContext }: ICanvas) {
+export interface ICanvas {
+  families: number
+  width: number;
+  height: number;
+  baseContext: CanvasRenderingContext2D;
+  type: 'spiral' | 'line';
+}
+
+function Canvas({ families, width, height, baseContext, type }: ICanvas) {
   const canvas = createRef<HTMLCanvasElement>();
   // const animationFrame = useRef<any>();
   const ctx = useRef<CanvasRenderingContext2D>();
@@ -15,14 +23,25 @@ function Canvas({ families, width, height, baseContext }: ICanvas) {
     if (canvas.current) {
       ctx.current = canvas.current?.getContext("2d")!;
       setTimeout(() => {
-        getSpiralPaint({
-          baseContext: baseContext!,
-          paintContext: ctx.current!,
-          families,
-          screenRatio,
-          width,
-          height,
-        });
+        if (type === "spiral") {
+          getSpiralPaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families,
+            screenRatio,
+            width,
+            height,
+          });
+        }
+        if (type === "line") {
+          getLinePaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families,
+            width,
+            height,
+          });
+        }
       }, 1000);
     }
   }, [canvas, baseContext, ctx, families, screenRatio, width, height]);

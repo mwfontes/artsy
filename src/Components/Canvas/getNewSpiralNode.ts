@@ -1,16 +1,34 @@
-import { getXRotationFunction } from "./getXRotationFunction";
+import { getXRotationFunction, TRotationFunction } from "./getXRotationFunction";
 import { getBasePixelData } from "../../utils/getBasePixelData";
-import { TNode } from "../../types";
+
+export type TSpiralNode = {
+  x: number;
+  y: number;
+  deg: number;
+  step: number;
+  directionMultiplierX: number;
+  directionMultiplierY: number;
+  speedRatio: number;
+  lineStepLimit: number;
+  descendant: number;
+  lineWidth: number;
+  color: {
+    r: number;
+    g: number;
+    b: number;
+  };
+  xRotationFunction: TRotationFunction;
+};
 
 interface ISpiralNode {
   baseContext: CanvasRenderingContext2D;
   width: number;
   height: number;
-  node?: TNode;
+  node?: TSpiralNode;
   lineWidth: number;
 }
 
-export const getNewSpiralNode = ({ baseContext, width, height, node, lineWidth }: ISpiralNode): TNode => {
+export const getNewSpiralNode = ({ baseContext, width, height, node, lineWidth }: ISpiralNode): TSpiralNode => {
   const newX = Math.floor(Math.random() * width);
   const newY = Math.floor(Math.random() * height);
 

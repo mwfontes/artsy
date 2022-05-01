@@ -12,14 +12,7 @@ interface ISpiralPaint {
   families: number;
 }
 
-export const getSpiralPaint = ({
-  baseContext,
-  paintContext,
-  width,
-  height,
-  screenRatio,
-  families,
-}: ISpiralPaint) => {
+export const getSpiralPaint = ({ baseContext, paintContext, width, height, screenRatio, families }: ISpiralPaint) => {
   const initialLineWidth = 100;
   const nodes = [getNewSpiralNode({ baseContext, width, height, lineWidth: initialLineWidth })];
   const maxBlockNodes = 20;
@@ -57,7 +50,7 @@ export const getSpiralPaint = ({
         nodes[i] = node;
 
         // Ends line life cycle
-        if (getIsOutOfBounds(node, width, height) || getIsFamilyOver(node, width, height)) {
+        if (getIsOutOfBounds({node, width, height}) || getIsFamilyOver({node})) {
           nodes.splice(i, 1);
           // if there's no node left, insert one again to start over
           if (!nodes.length) {
@@ -66,7 +59,7 @@ export const getSpiralPaint = ({
                 baseContext,
                 width,
                 height,
-                lineWidth: initialLineWidth - (initialLineWidth / families),
+                lineWidth: initialLineWidth - initialLineWidth / families,
               })
             );
             currentFamily++;
@@ -85,11 +78,6 @@ export const getSpiralPaint = ({
                   ...node,
                   descendant: node.descendant + 1,
                   lineWidth: node.lineWidth / 2,
-                  color: {
-                    r: currentColor[0],
-                    g: currentColor[1],
-                    b: currentColor[2],
-                  },
                 },
                 lineWidth: node.lineWidth / 2,
               })

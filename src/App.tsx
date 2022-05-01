@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div className='App'>
-      <Canvas width={2480} height={3508} baseContext={baseContext!} families={100} />
+      <Canvas width={2480} height={3508} baseContext={baseContext!} families={50} type="line" />
     </div>
   );
 }
