@@ -28,7 +28,7 @@ export const getSpiralPaint = ({ baseContext, paintContext, width, height, scree
 
   const getBaseColor = (node: TSpiralNode): TColor => {
     const {color} = node;
-    
+
     if (node.step % stepsPerColor === 0) {
       const newColor = getBasePixelData(node.x, node.y, baseContext);
       return {
@@ -121,11 +121,6 @@ export const getSpiralPaint = ({ baseContext, paintContext, width, height, scree
         paintContext.lineWidth = lineWidth;
         paintContext.lineCap = "round";
         paintContext.stroke();
-        
-        // paintContext.beginPath();
-        // paintContext.arc(node.originalX, node.originalY, 50, 0, 2 * Math.PI, false);
-        // paintContext.fillStyle = `rgb(${segmentColor.r}, ${segmentColor.g}, ${segmentColor.b}, 0.5)`;
-        // paintContext.fill();
 
         // Initial blocks
         const correctedBlockNodeInterval = Math.floor((lineWidth / stepSize) * blockNodeInterval);
