@@ -45,5 +45,5 @@ export const getLinePaint = ({ baseContext, paintContext, width, height, familie
 
     node = getNewLineNode({ width, height, originX: destinationX, originY: destinationY });
     currentFamily++;
-  } while (currentFamily <= families * 50);
+  } while (currentFamily <= families * 80);
 };

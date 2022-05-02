@@ -96,13 +96,16 @@ export const getSpiralPaint = ({ baseContext, paintContext, width, height, scree
         paintContext.lineCap = "round";
         paintContext.stroke();
 
+        // Initial blocks
         const correctedBlockNodeInterval = Math.floor((lineWidth / stepSize) * blockNodeInterval);
         if (
           currentStep <= maxBlockNodes * correctedBlockNodeInterval &&
           currentStep % correctedBlockNodeInterval === 0
         ) {
-          paintContext.strokeStyle = `rgb(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]})`;
+          paintContext.strokeStyle = `rgb(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]}, 0.25)`;
+          paintContext.fillStyle = `rgb(${currentColor[0]}, ${currentColor[1]}, ${currentColor[2]}, 0.5)`;
           paintContext.lineWidth = lineWidth / 4;
+          paintContext.fillRect(x - lineWidth * 2, y - lineWidth * 2, lineWidth * 4, lineWidth * 4);
           paintContext.strokeRect(x - lineWidth * 2, y - lineWidth * 2, lineWidth * 4, lineWidth * 4);
         }
       }

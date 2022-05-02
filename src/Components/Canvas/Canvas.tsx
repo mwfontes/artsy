@@ -1,16 +1,17 @@
 import React, { createRef, useRef, useEffect } from "react";
+import { cx, css } from "@emotion/css";
 
 import { getSpiralPaint } from "./getSpiralPaint";
-import {getLinePaint} from "./getLinePaint";
+import { getLinePaint } from "./getLinePaint";
 
-import "./Canvas.css";
+import styles from "./Canvas.styles";
 
 export interface ICanvas {
-  families: number
+  families: number;
   width: number;
   height: number;
   baseContext: CanvasRenderingContext2D;
-  type: 'spiral' | 'line' | 'hybrid';
+  type: "spiral" | "line" | "hybrid";
 }
 
 function Canvas({ families, width, height, baseContext, type }: ICanvas) {
@@ -46,7 +47,7 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
           getLinePaint({
             baseContext: baseContext!,
             paintContext: ctx.current!,
-            families: families / 2,
+            families: families / 4,
             width,
             height,
           });
@@ -58,12 +59,19 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
             width,
             height,
           });
+          getLinePaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families: families / 32,
+            width,
+            height,
+          });
         }
       }, 1000);
     }
   }, [canvas, baseContext, ctx, families, screenRatio, width, height]);
 
-  return <canvas className='canvas' width={width} height={height} ref={canvas} />;
+  return <canvas className={cx(styles.component)} width={width} height={height} ref={canvas} />;
 }
 
 export default Canvas;
