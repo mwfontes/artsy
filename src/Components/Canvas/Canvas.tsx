@@ -6,12 +6,18 @@ import { getLinePaint } from "./getLinePaint";
 
 import styles from "./Canvas.styles";
 
+export enum EPaintType {
+  SPIRAL = 'spiral',
+  LINE = 'line',
+  HYBRID = 'hybrid',
+}
+
 export interface ICanvas {
   families: number;
   width: number;
   height: number;
   baseContext: CanvasRenderingContext2D;
-  type: "spiral" | "line" | "hybrid";
+  type: EPaintType;
 }
 
 function Canvas({ families, width, height, baseContext, type }: ICanvas) {
@@ -24,7 +30,7 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
     if (canvas.current) {
       ctx.current = canvas.current?.getContext("2d")!;
       setTimeout(() => {
-        if (type === "spiral") {
+        if (type === EPaintType.SPIRAL) {
           getSpiralPaint({
             baseContext: baseContext!,
             paintContext: ctx.current!,
@@ -34,7 +40,7 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
             height,
           });
         }
-        if (type === "line") {
+        if (type === EPaintType.LINE) {
           getLinePaint({
             baseContext: baseContext!,
             paintContext: ctx.current!,
@@ -43,7 +49,7 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
             height,
           });
         }
-        if (type === "hybrid") {
+        if (type === EPaintType.HYBRID) {
           getLinePaint({
             baseContext: baseContext!,
             paintContext: ctx.current!,
@@ -65,6 +71,7 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
             families: families / 32,
             width,
             height,
+            opacity: 0.5
           });
         }
       }, 1000);

@@ -31,13 +31,14 @@ interface ISpiralNode {
 export const getNewSpiralNode = ({ baseContext, width, height, node, lineWidth }: ISpiralNode): TSpiralNode => {
   const newX = Math.floor(Math.random() * width);
   const newY = Math.floor(Math.random() * height);
+  const newDeg = Math.random() * 2 * Math.PI;
 
   const imagePixelColor = getBasePixelData(node?.x || newX, node?.y || newY, baseContext);
 
   return {
     x: node?.x || newX,
     y: node?.y || newY,
-    deg: Math.random() * 2 * Math.PI,
+    deg: newDeg,
     step: 0,
     directionMultiplierX: Math.floor(Math.random() * 2) || -1, // -1 or 1
     directionMultiplierY: Math.floor(Math.random() * 2) || -1, // -1 or 1

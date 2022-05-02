@@ -5,6 +5,7 @@ export default {
     label: settings;
     display: flex;
     flex-direction: column;
+    margin-right: 40px;
   `,
   input: css`
     label: settings__input;

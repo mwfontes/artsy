@@ -7,9 +7,10 @@ interface ILinePaint {
   width: number;
   height: number;
   families: number;
+  opacity?: number;
 }
 
-export const getLinePaint = ({ baseContext, paintContext, width, height, families }: ILinePaint) => {
+export const getLinePaint = ({ baseContext, paintContext, width, height, families, opacity = 1 }: ILinePaint) => {
   const lineWidth = 4;
   const lineSegmentsSteps = 10;
   let currentFamily = 0;
@@ -26,7 +27,6 @@ export const getLinePaint = ({ baseContext, paintContext, width, height, familie
       const destinationColor = getBasePixelData(destinationX, destinationY, baseContext);
 
       for (let i = 0; i < lineSegmentsSteps; i++) {
-
         const segmentColor = {
           r: Math.round(originColor[0] + ((destinationColor[0] - originColor[0]) / lineSegmentsSteps) * i),
           g: Math.round(originColor[1] + ((destinationColor[1] - originColor[1]) / lineSegmentsSteps) * i),
@@ -36,7 +36,7 @@ export const getLinePaint = ({ baseContext, paintContext, width, height, familie
         paintContext.beginPath();
         paintContext.moveTo(originX + xSegment * i, originY + ySegment * i);
         paintContext.lineTo(originX + xSegment * (i + 1), originY + ySegment * (i + 1));
-        paintContext.strokeStyle = `rgba(${segmentColor.r}, ${segmentColor.g}, ${segmentColor.b}, 0.25)`;
+        paintContext.strokeStyle = `rgba(${segmentColor.r}, ${segmentColor.g}, ${segmentColor.b}, ${0.25 * opacity})`;
         paintContext.lineWidth = lineWidth;
         paintContext.lineCap = "round";
         paintContext.stroke();
