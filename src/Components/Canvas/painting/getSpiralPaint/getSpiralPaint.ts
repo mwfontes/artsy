@@ -1,7 +1,7 @@
 import { getNewSpiralNode, TSpiralNode } from "./getNewSpiralNode";
-import { getBasePixelData } from "../../utils/getBasePixelData";
-import { getIsOutOfBounds } from "../../utils/getIsOutOfBounds";
-import { getIsFamilyOver } from "../../utils/getIsFamilyOver";
+import { getBasePixelData } from "../../../../utils/getBasePixelData";
+import { getIsOutOfBounds } from "../../../../utils/getIsOutOfBounds";
+import { getIsFamilyOver } from "../../../../utils/getIsFamilyOver";
 
 interface ISpiralPaint {
   baseContext: CanvasRenderingContext2D;

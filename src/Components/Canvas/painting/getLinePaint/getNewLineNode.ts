@@ -1,5 +1,5 @@
-import { getXRotationFunction, TRotationFunction } from "./getXRotationFunction";
-import { getBasePixelData } from "../../utils/getBasePixelData";
+import { getXRotationFunction, TRotationFunction } from "../getSpiralPaint/getXRotationFunction";
+import { getBasePixelData } from "../../../../utils/getBasePixelData";
 
 export type TLineNode = {
   originX?: number;

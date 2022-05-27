@@ -1,5 +1,5 @@
 import { getXRotationFunction, TRotationFunction } from "./getXRotationFunction";
-import { getBasePixelData } from "../../utils/getBasePixelData";
+import { getBasePixelData } from "../../../../utils/getBasePixelData";
 
 export type TSpiralNode = {
   x: number;

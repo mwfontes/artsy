@@ -1,15 +1,24 @@
 import React, { createRef, useRef, useEffect } from "react";
-import { cx, css } from "@emotion/css";
+import { cx } from "@emotion/css";
 
-import { getSpiralPaint } from "./getSpiralPaint";
-import { getLinePaint } from "./getLinePaint";
+import { getSpiralPaint } from "./painting/getSpiralPaint/getSpiralPaint";
+import { getLinePaint } from "./painting/getLinePaint/getLinePaint";
+import { getHorizontalPaint } from "./painting/getHorizontalPaint/getHorizontalPaint";
+import { getVerticalPaint } from "./painting/getVerticalPaint/getVerticalPaint";
+import { getHorizontalVerticalPaint } from "./painting/hybrids/getHorizontalVerticalPaint";
+import { getSpiralLinePaint } from "./painting/hybrids/getSpiralLinePaint";
+import { getSlashPaint } from "./painting/getSlashPaint/getSlashPaint";
 
 import styles from "./Canvas.styles";
 
 export enum EPaintType {
-  SPIRAL = 'spiral',
-  LINE = 'line',
-  HYBRID = 'hybrid',
+  SPIRAL = "spiral",
+  LINE = "line",
+  HORIZONTAL = "horizontal lines",
+  VERTICAL = "vertical lines",
+  SLASH = "slash lines",
+  HYBRID_HORIZONTAL_VERTICAL = "horizontal + vertical lines",
+  HYBRID_SPIRAL_LINE = "spiral + line",
 }
 
 export interface ICanvas {
@@ -22,7 +31,6 @@ export interface ICanvas {
 
 function Canvas({ families, width, height, baseContext, type }: ICanvas) {
   const canvas = createRef<HTMLCanvasElement>();
-  // const animationFrame = useRef<any>();
   const ctx = useRef<CanvasRenderingContext2D>();
   const screenRatio = width > height ? height / width : width / height;
 
@@ -49,29 +57,53 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
             height,
           });
         }
-        if (type === EPaintType.HYBRID) {
-          getLinePaint({
+        if (type === EPaintType.HYBRID_SPIRAL_LINE) {
+          getSpiralLinePaint({
             baseContext: baseContext!,
             paintContext: ctx.current!,
-            families: families / 4,
-            width,
-            height,
-          });
-          getSpiralPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families: families / 2,
+            families,
             screenRatio,
             width,
             height,
           });
-          getLinePaint({
+        }
+        if (type === EPaintType.HORIZONTAL) {
+          getHorizontalPaint({
             baseContext: baseContext!,
             paintContext: ctx.current!,
-            families: families / 32,
+            families,
             width,
             height,
-            opacity: 0.5
+          });
+        }
+        if (type === EPaintType.VERTICAL) {
+          getVerticalPaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families,
+            width,
+            height,
+            density: 1,
+          });
+        }
+        if (type === EPaintType.HYBRID_HORIZONTAL_VERTICAL) {
+          getHorizontalVerticalPaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families,
+            width,
+            height,
+            density: 1,
+          });
+        }
+        if (type === EPaintType.SLASH) {
+          getSlashPaint({
+            baseContext: baseContext!,
+            paintContext: ctx.current!,
+            families,
+            width,
+            height,
+            density: 1,
           });
         }
       }, 1000);
@@ -82,3 +114,4 @@ function Canvas({ families, width, height, baseContext, type }: ICanvas) {
 }
 
 export default Canvas;
+
