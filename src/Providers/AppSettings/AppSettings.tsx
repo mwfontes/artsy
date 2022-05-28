@@ -1,57 +1,41 @@
-import { createContext, ReactElement, ReactNode, useContext, useState } from "react";
+import {createContext, useEffect, useState, useContext} from 'react';
 
 export enum EPaintType {
-  SPIRAL = "spiral",
-  LINE = "line",
-  HYBRID = "hybrid",
+  SPIRAL = 'spiral',
+  LINE = 'line',
+  HORIZONTAL = 'horizontal lines',
+  VERTICAL = 'vertical lines',
+  SLASH = 'slash lines',
+  HYBRID_HORIZONTAL_VERTICAL = 'horizontal + vertical lines',
+  HYBRID_SPIRAL_LINE = 'spiral + line',
 }
 
-type TSettings = {
-  // Get
-  imageUrl: string;
+export type IAppSettings = {
   families: number;
-  type: EPaintType;
-
-  // Set
-  setType: (type: EPaintType) => void;
+  paintType: EPaintType;
+  setFamilies(families: number): void;
+  setPaintType(paintType: EPaintType): void;
 };
 
-interface ISettings {
-  children: ReactNode;
-}
-
-interface ISettingsContext extends TSettings {
-  Provider: ReactElement;
-}
-
-const initialSettings: TSettings = {
-  imageUrl: "",
+const SettingsContext = createContext<IAppSettings>({
   families: 1,
-  type: EPaintType.SPIRAL,
+  paintType: EPaintType.SLASH,
+  setFamilies: () => {},
+  setPaintType: () => {},
+});
 
-  setType: () => {},
-};
-
-export const SettingsContext = createContext<TSettings>(initialSettings);
-
-export const useAppSettings = (): TSettings => useContext(SettingsContext);
-
-export function AppSettings({ children }: ISettings): ISettingsContext {
-  const [type, setType] = useState<EPaintType>(initialSettings.type);
-
-  const provider = (
-    <SettingsContext.Provider
-      value={{ ...initialSettings, type, setType }}
-    >
-      {children}
-    </SettingsContext.Provider>
-  );
+export const appSettings = (from?: string): IAppSettings => {
+  const [families, setFamilies] = useState<number>(1);
+  const [paintType, setPaintType] = useState<EPaintType>(EPaintType.SLASH);
 
   return {
-    Provider: provider,
-    type,
-    setType,
-    families: initialSettings.families,
-    imageUrl: initialSettings.imageUrl,
+    families,
+    paintType,
+    setFamilies,
+    setPaintType,
   };
-}
+};
+
+export const useAppSettings = (): IAppSettings => useContext(SettingsContext);
+
+export default SettingsContext;

@@ -1,5 +1,5 @@
-import { getSpiralPaint } from "../getSpiralPaint/getSpiralPaint";
-import { getLinePaint } from "../getLinePaint/getLinePaint";
+import {getSpiralPaint} from '../getSpiralPaint/getSpiralPaint';
+import {getLinePaint} from '../getLinePaint/getLinePaint';
 
 interface IGetSpiralLinePaint {
   baseContext: CanvasRenderingContext2D;

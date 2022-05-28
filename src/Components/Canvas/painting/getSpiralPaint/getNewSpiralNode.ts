@@ -1,5 +1,5 @@
-import { getXRotationFunction, TRotationFunction } from "./getXRotationFunction";
-import { getBasePixelData } from "../../../../utils/getBasePixelData";
+import {getXRotationFunction, TRotationFunction} from './getXRotationFunction';
+import {getBasePixelData} from '../../../../utils/getBasePixelData';
 
 export type TSpiralNode = {
   x: number;
@@ -28,7 +28,7 @@ interface ISpiralNode {
   lineWidth: number;
 }
 
-export const getNewSpiralNode = ({ baseContext, width, height, node, lineWidth }: ISpiralNode): TSpiralNode => {
+export const getNewSpiralNode = ({baseContext, width, height, node, lineWidth}: ISpiralNode): TSpiralNode => {
   const newX = Math.floor(Math.random() * width);
   const newY = Math.floor(Math.random() * height);
   const newDeg = Math.random() * 2 * Math.PI;

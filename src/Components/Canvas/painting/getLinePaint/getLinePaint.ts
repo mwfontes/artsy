@@ -1,5 +1,5 @@
-import { getBasePixelData } from "../../../../utils/getBasePixelData";
-import { getNewLineNode, TLineNode } from "./getNewLineNode";
+import {getBasePixelData} from '../../../../utils/getBasePixelData';
+import {getNewLineNode, TLineNode} from './getNewLineNode';
 
 interface ILinePaint {
   baseContext: CanvasRenderingContext2D;
@@ -10,14 +10,14 @@ interface ILinePaint {
   density?: number;
 }
 
-export const getLinePaint = ({ baseContext, paintContext, width, height, families, density = 1 }: ILinePaint) => {
+export const getLinePaint = ({baseContext, paintContext, width, height, families, density = 1}: ILinePaint) => {
   const lineWidth = 20;
   const lineSegmentsSteps = 10;
   let currentFamily = 0;
-  let node: TLineNode = getNewLineNode({ width, height });
+  let node: TLineNode = getNewLineNode({width, height});
 
   do {
-    const { originX, originY, x: destinationX, y: destinationY } = node;
+    const {originX, originY, x: destinationX, y: destinationY} = node;
 
     if (originX && originY) {
       const xSegment = (destinationX - originX) / lineSegmentsSteps;
@@ -38,12 +38,12 @@ export const getLinePaint = ({ baseContext, paintContext, width, height, familie
         paintContext.lineTo(originX + xSegment * (i + 1), originY + ySegment * (i + 1));
         paintContext.strokeStyle = `rgba(${segmentColor.r}, ${segmentColor.g}, ${segmentColor.b}, ${density})`;
         paintContext.lineWidth = lineWidth;
-        paintContext.lineCap = "round";
+        paintContext.lineCap = 'round';
         paintContext.stroke();
       }
     }
 
-    node = getNewLineNode({ width, height, originX: destinationX, originY: destinationY });
+    node = getNewLineNode({width, height, originX: destinationX, originY: destinationY});
     currentFamily++;
   } while (currentFamily <= families * 80);
 };

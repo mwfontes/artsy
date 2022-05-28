@@ -1,5 +1,5 @@
-import { getXRotationFunction, TRotationFunction } from "../getSpiralPaint/getXRotationFunction";
-import { getBasePixelData } from "../../../../utils/getBasePixelData";
+import {getXRotationFunction, TRotationFunction} from '../getSpiralPaint/getXRotationFunction';
+import {getBasePixelData} from '../../../../utils/getBasePixelData';
 
 export type TLineNode = {
   originX?: number;
@@ -15,7 +15,7 @@ interface ILineNode {
   originY?: number;
 }
 
-export const getNewLineNode = ({ width, height, originX, originY }: ILineNode): TLineNode => {
+export const getNewLineNode = ({width, height, originX, originY}: ILineNode): TLineNode => {
   const newX = Math.floor(Math.random() * width);
   const newY = Math.floor(Math.random() * height);
 

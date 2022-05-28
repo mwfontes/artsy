@@ -1,11 +1,11 @@
-import { TLineNode } from "../Components/Canvas/painting/getLinePaint/getNewLineNode";
-import { TSpiralNode } from "../Components/Canvas/painting/getSpiralPaint/getNewSpiralNode";
+import {TLineNode} from '../Components/Canvas/painting/getLinePaint/getNewLineNode';
+import {TSpiralNode} from '../Components/Canvas/painting/getSpiralPaint/getNewSpiralNode';
 
 interface IGetIsFamilyOver {
   node: TSpiralNode;
 }
 
-export const getIsFamilyOver = ({ node }: IGetIsFamilyOver): boolean => {
+export const getIsFamilyOver = ({node}: IGetIsFamilyOver): boolean => {
   // Family grow is over
   if (node.descendant >= 4) {
     return true;

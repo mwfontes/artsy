@@ -1,7 +1,7 @@
-import { getNewSpiralNode, TSpiralNode } from "./getNewSpiralNode";
-import { getBasePixelData } from "../../../../utils/getBasePixelData";
-import { getIsOutOfBounds } from "../../../../utils/getIsOutOfBounds";
-import { getIsFamilyOver } from "../../../../utils/getIsFamilyOver";
+import {getNewSpiralNode, TSpiralNode} from './getNewSpiralNode';
+import {getBasePixelData} from '../../../../utils/getBasePixelData';
+import {getIsOutOfBounds} from '../../../../utils/getIsOutOfBounds';
+import {getIsFamilyOver} from '../../../../utils/getIsFamilyOver';
 
 interface ISpiralPaint {
   baseContext: CanvasRenderingContext2D;
@@ -16,11 +16,11 @@ type TColor = {
   r: number;
   g: number;
   b: number;
-}
+};
 
-export const getSpiralPaint = ({ baseContext, paintContext, width, height, screenRatio, families }: ISpiralPaint) => {
+export const getSpiralPaint = ({baseContext, paintContext, width, height, screenRatio, families}: ISpiralPaint) => {
   const initialLineWidth = 20;
-  const nodes = [getNewSpiralNode({ baseContext, width, height, lineWidth: initialLineWidth })];
+  const nodes = [getNewSpiralNode({baseContext, width, height, lineWidth: initialLineWidth})];
   const maxBlockNodes = 20;
   const blockNodeInterval = 3;
   const stepsPerColor = 20;
@@ -35,11 +35,11 @@ export const getSpiralPaint = ({ baseContext, paintContext, width, height, scree
         r: newColor[0],
         g: newColor[1],
         b: newColor[2],
-      }
+      };
     }
 
     return color;
-  }
+  };
 
   do {
     // for each node, draw the next lines
@@ -76,7 +76,7 @@ export const getSpiralPaint = ({ baseContext, paintContext, width, height, scree
         nodes[i] = node;
 
         // Ends line life cycle
-        if (getIsOutOfBounds({ node, width, height }) || getIsFamilyOver({ node })) {
+        if (getIsOutOfBounds({node, width, height}) || getIsFamilyOver({node})) {
           nodes.splice(i, 1);
           // if there's no node left, insert one again to start over
           if (!nodes.length) {
@@ -119,7 +119,7 @@ export const getSpiralPaint = ({ baseContext, paintContext, width, height, scree
         paintContext.lineTo(node.x, node.y); // end point
         paintContext.strokeStyle = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
         paintContext.lineWidth = lineWidth;
-        paintContext.lineCap = "round";
+        paintContext.lineCap = 'round';
         paintContext.stroke();
 
         // Initial blocks

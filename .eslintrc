@@ -1,5 +1,19 @@
 {
   "rules": {
     "no-loop-func": 0,
+    "no-shadow": "off",
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "object-curly-spacing": ["error", "never"],
+    "@typescript-eslint/camelcase": 0
   }
 }

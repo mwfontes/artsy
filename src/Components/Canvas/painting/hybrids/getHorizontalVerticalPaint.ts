@@ -1,5 +1,5 @@
-import { getHorizontalPaint } from "../getHorizontalPaint/getHorizontalPaint";
-import { getVerticalPaint } from "../getVerticalPaint/getVerticalPaint";
+import {getHorizontalPaint} from '../getHorizontalPaint/getHorizontalPaint';
+import {getVerticalPaint} from '../getVerticalPaint/getVerticalPaint';
 
 interface IGetHorizontalVertical {
   baseContext: CanvasRenderingContext2D;
