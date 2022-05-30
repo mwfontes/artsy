@@ -1,5 +1,5 @@
-import {TLineNode} from '../Components/Canvas/painting/getLinePaint/getNewLineNode';
-import {TSpiralNode} from '../Components/Canvas/painting/getSpiralPaint/getNewSpiralNode';
+import {TLineNode} from '../Components/Canvas/painting/getGradientLinesPaint/getNewGradientLinesNode';
+import {TSpiralNode} from '../Components/Canvas/painting/getSpiralsPaint/getNewSpiralsNode';
 
 interface IGetIsFamilyOver {
   node: TSpiralNode;

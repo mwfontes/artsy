@@ -1,5 +1,5 @@
-import {getHorizontalPaint} from '../getHorizontalPaint/getHorizontalPaint';
-import {getVerticalPaint} from '../getVerticalPaint/getVerticalPaint';
+import {getHorizontalLinesPaint} from '../getHorizontalLinesPaint/getHorizontalLinesPaint';
+import {getVerticalLinesPaint} from '../getVerticalLinesPaint/getVerticalLinesPaint';
 
 interface IGetHorizontalVertical {
   baseContext: CanvasRenderingContext2D;
@@ -10,21 +10,21 @@ interface IGetHorizontalVertical {
   density?: number;
 }
 
-export const getHorizontalVerticalPaint = ({
+export const getHorizontalVerticalLinesPaint = ({
   baseContext,
   paintContext,
   width,
   height,
   families,
 }: IGetHorizontalVertical) => {
-  getHorizontalPaint({
+  getHorizontalLinesPaint({
     baseContext,
     paintContext,
     families,
     width,
     height,
   });
-  getVerticalPaint({
+  getVerticalLinesPaint({
     baseContext,
     paintContext,
     families,

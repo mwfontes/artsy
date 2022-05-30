@@ -1,13 +1,14 @@
 import {createContext, useEffect, useState, useContext} from 'react';
 
 export enum EPaintType {
-  SPIRAL = 'spiral',
-  LINE = 'line',
-  HORIZONTAL = 'horizontal lines',
-  VERTICAL = 'vertical lines',
-  SLASH = 'slash lines',
-  HYBRID_HORIZONTAL_VERTICAL = 'horizontal + vertical lines',
-  HYBRID_SPIRAL_LINE = 'spiral + line',
+  SPIRALS = 'Spirals',
+  GRADIENT_LINES = 'Gradient lines',
+  HORIZONTAL_LINES = 'Horizontal lines',
+  VERTICAL_LINES = 'Vertical lines',
+  SLASH_LINES = 'Slash lines',
+  TRIANGLES = 'Triangles',
+  HYBRID_HORIZONTAL_VERTICAL_LINES = 'Horizontal + Vertical lines',
+  HYBRID_SPIRALS_GRADIENT_LINES = 'Spirals & Gradient lines',
 }
 
 export type IAppSettings = {
@@ -19,14 +20,14 @@ export type IAppSettings = {
 
 const SettingsContext = createContext<IAppSettings>({
   families: 1,
-  paintType: EPaintType.SLASH,
+  paintType: EPaintType.SLASH_LINES,
   setFamilies: () => {},
   setPaintType: () => {},
 });
 
 export const appSettings = (from?: string): IAppSettings => {
   const [families, setFamilies] = useState<number>(1);
-  const [paintType, setPaintType] = useState<EPaintType>(EPaintType.SLASH);
+  const [paintType, setPaintType] = useState<EPaintType>(EPaintType.SLASH_LINES);
 
   return {
     families,

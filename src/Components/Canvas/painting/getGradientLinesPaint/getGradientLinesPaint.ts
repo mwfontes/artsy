@@ -1,5 +1,5 @@
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
-import {getNewLineNode, TLineNode} from './getNewLineNode';
+import {getNewGradientLinesNode, TLineNode} from './getNewGradientLinesNode';
 
 interface ILinePaint {
   baseContext: CanvasRenderingContext2D;
@@ -10,11 +10,11 @@ interface ILinePaint {
   density?: number;
 }
 
-export const getLinePaint = ({baseContext, paintContext, width, height, families, density = 1}: ILinePaint) => {
+export const getGradientLinesPaint = ({baseContext, paintContext, width, height, families, density = 1}: ILinePaint) => {
   const lineWidth = 20;
   const lineSegmentsSteps = 10;
   let currentFamily = 0;
-  let node: TLineNode = getNewLineNode({width, height});
+  let node: TLineNode = getNewGradientLinesNode({width, height});
 
   do {
     const {originX, originY, x: destinationX, y: destinationY} = node;
@@ -43,7 +43,7 @@ export const getLinePaint = ({baseContext, paintContext, width, height, families
       }
     }
 
-    node = getNewLineNode({width, height, originX: destinationX, originY: destinationY});
+    node = getNewGradientLinesNode({width, height, originX: destinationX, originY: destinationY});
     currentFamily++;
   } while (currentFamily <= families * 80);
 };

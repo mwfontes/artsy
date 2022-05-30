@@ -1,4 +1,4 @@
-import {getNewSpiralNode, TSpiralNode} from './getNewSpiralNode';
+import {getNewSpiralsNode, TSpiralNode} from './getNewSpiralsNode';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getIsOutOfBounds} from '../../../../utils/getIsOutOfBounds';
 import {getIsFamilyOver} from '../../../../utils/getIsFamilyOver';
@@ -18,9 +18,9 @@ type TColor = {
   b: number;
 };
 
-export const getSpiralPaint = ({baseContext, paintContext, width, height, screenRatio, families}: ISpiralPaint) => {
+export const getSpiralsPaint = ({baseContext, paintContext, width, height, screenRatio, families}: ISpiralPaint) => {
   const initialLineWidth = 20;
-  const nodes = [getNewSpiralNode({baseContext, width, height, lineWidth: initialLineWidth})];
+  const nodes = [getNewSpiralsNode({baseContext, width, height, lineWidth: initialLineWidth})];
   const maxBlockNodes = 20;
   const blockNodeInterval = 3;
   const stepsPerColor = 20;
@@ -81,7 +81,7 @@ export const getSpiralPaint = ({baseContext, paintContext, width, height, screen
           // if there's no node left, insert one again to start over
           if (!nodes.length) {
             nodes.push(
-              getNewSpiralNode({
+              getNewSpiralsNode({
                 baseContext,
                 width,
                 height,
@@ -96,7 +96,7 @@ export const getSpiralPaint = ({baseContext, paintContext, width, height, screen
         if (node.step >= lineStepLimit) {
           for (let i = 0; i < (node.descendant + 1) * 2; i++) {
             nodes.push(
-              getNewSpiralNode({
+              getNewSpiralsNode({
                 baseContext,
                 width,
                 height,

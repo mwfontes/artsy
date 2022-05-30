@@ -1,5 +1,5 @@
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
-import {getNewLineNode, TLineNode} from '../getLinePaint/getNewLineNode';
+import {getNewGradientLinesNode, TLineNode} from '../getGradientLinesPaint/getNewGradientLinesNode';
 
 interface IHorizontalPaint {
   baseContext: CanvasRenderingContext2D;
@@ -10,7 +10,7 @@ interface IHorizontalPaint {
   density?: number;
 }
 
-export const getHorizontalPaint = ({
+export const getHorizontalLinesPaint = ({
   baseContext,
   paintContext,
   width,

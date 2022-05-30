@@ -1,4 +1,4 @@
-import {getXRotationFunction, TRotationFunction} from '../getSpiralPaint/getXRotationFunction';
+import {getXRotationFunction, TRotationFunction} from '../getSpiralsPaint/getXRotationFunction';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 
 export type TSlashNode = {
@@ -15,7 +15,7 @@ interface ISlashNode {
   height: number;
 }
 
-export const getNewSlashNode = ({width, height}: ISlashNode): TSlashNode => {
+export const getNewSlashLinesNode = ({width, height}: ISlashNode): TSlashNode => {
   const centerX = Math.floor(Math.random() * width);
   const centerY = Math.floor(Math.random() * height);
   const angle = Math.random() * Math.PI * 2;

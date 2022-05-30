@@ -1,5 +1,5 @@
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
-import {getNewLineNode, TLineNode} from '../getLinePaint/getNewLineNode';
+import {getNewGradientLinesNode, TLineNode} from '../getGradientLinesPaint/getNewGradientLinesNode';
 
 interface IVerticalPaint {
   baseContext: CanvasRenderingContext2D;
@@ -10,7 +10,7 @@ interface IVerticalPaint {
   density?: number;
 }
 
-export const getVerticalPaint = ({baseContext, paintContext, width, height, families, density = 1}: IVerticalPaint) => {
+export const getVerticalLinesPaint = ({baseContext, paintContext, width, height, families, density = 1}: IVerticalPaint) => {
   const lineWidth = height / (families / 5);
   const lineSegmentsSteps = (height / width) * 5;
 
