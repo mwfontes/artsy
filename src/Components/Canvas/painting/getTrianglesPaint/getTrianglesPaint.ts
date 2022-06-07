@@ -3,6 +3,7 @@ import {getNewTriangleVertex} from './getNewTriangleVertex';
 import {getDistanceBetweenTwoVertices} from '../../../../utils/getDistanceBetweenTwoVertices';
 import {TVertex} from '../../../../Types';
 import {getClosestVertex} from '../../../../utils/getClosestVertex';
+import {getLinesColliding} from '../../../../utils/getLinesColliding';
 
 interface ITrianglePaint {
   baseContext: CanvasRenderingContext2D;
@@ -28,11 +29,9 @@ export const getTrianglesPaint = ({
     x: Math.round(width / 2),
     y: Math.round(height / 2),
   };
-  const radialsUsedVertices: TVertex[] = [];
 
   // Build border horizontal vertices
-  const xStepSize = Math.round(width / (baseDensity));
-  console.log('xStepSize', xStepSize);
+  const xStepSize = Math.round(width / baseDensity);
   for (let i = 0; i <= width + xStepSize; i += xStepSize) {
     // Top
     vertices.push(getNewTriangleVertex({x: i, y: 0}));
@@ -67,83 +66,45 @@ export const getTrianglesPaint = ({
     paintContext.fill();
   });
 
-  // builds central triangle
-  let minDistanceFound: number;
-  let centerVertex: TVertex = vertices[0];
+  // builds initial connections (all * all)
   vertices.forEach((vertex) => {
-    const distance = getDistanceBetweenTwoVertices(centerPoint, vertex);
-    if (!minDistanceFound || distance < minDistanceFound) {
-      minDistanceFound = distance;
-      centerVertex = vertex;
-    }
-  });
-
-  // Connect central vertices
-  centerVertex.connectedVertices.push(getClosestVertex({vertices, vertex: centerVertex}));
-  centerVertex.connectedVertices.push(
-    getClosestVertex({
-      vertices,
-      vertex: centerVertex,
-      maxAngle: Math.PI / 2,
-      minAngle: Math.PI / 8,
-      compareAngleToVertex: centerVertex.connectedVertices[0],
-    })
-  );
-  radialsUsedVertices.push(...[centerVertex, ...centerVertex.connectedVertices]);
-
-  // Paint center vertex
-  paintContext.beginPath();
-  paintContext.arc(centerVertex.x, centerVertex.y, 20, 0, 2 * Math.PI);
-  paintContext.fillStyle = 'green';
-  paintContext.fill();
-
-  // Paint central edges
-  centerVertex.connectedVertices.forEach((centerVertexConnectedVerticesEntry) => {
-    paintContext.beginPath();
-    paintContext.moveTo(centerVertex.x, centerVertex.y);
-    paintContext.lineTo(centerVertexConnectedVerticesEntry.x, centerVertexConnectedVerticesEntry.y);
-    paintContext.strokeStyle = 'gray';
-    paintContext.lineWidth = 8;
-    paintContext.stroke();
-  });
-/*
-  // Creates radial connections
-  const segmentInitialVertex = getClosestVertex({vertex: centerVertex, vertices, ignoreVertices: radialsUsedVertices});
-  radialsUsedVertices.push(segmentInitialVertex);
-  let lastConnectedSegmentVertex: TVertex = segmentInitialVertex;
-  vertices.forEach((vertex) => {
-    const closestRadialVertex = getClosestVertex({
-      vertex: centerVertex,
-      vertices,
-      ignoreVertices: radialsUsedVertices,
-      isFollowOrientation: true,
-      compareAngleToVertex: lastConnectedSegmentVertex,
-      maxAngle: Math.PI / 2,
+    vertices.forEach((connectionProspectVertex) => {
+      if (vertex !== connectionProspectVertex && !connectionProspectVertex.connectedVertices.includes(vertex)) {
+        vertex.connectedVertices.push(connectionProspectVertex);
+      }
     });
-    lastConnectedSegmentVertex.connectedVertices.push(closestRadialVertex);
-    lastConnectedSegmentVertex = closestRadialVertex;
-    radialsUsedVertices.push(lastConnectedSegmentVertex);
   });
 
-  // Paint segmentInitialVertex
-  paintContext.beginPath();
-  paintContext.arc(segmentInitialVertex.x, segmentInitialVertex.y, 20, 0, 2 * Math.PI);
-  paintContext.fillStyle = 'orange';
-  paintContext.fill();
-
-  // Paint radial lines
-  const paintRadialLines = (vertex: TVertex): any => {
-    paintContext.beginPath();
-    paintContext.moveTo(vertex.x, vertex.y);
-    paintContext.lineTo(vertex.connectedVertices[0].x, vertex.connectedVertices[0].y);
-    paintContext.strokeStyle = '#aaaaaa';
-    paintContext.lineWidth = 4;
-    paintContext.stroke();
-    if (vertex.connectedVertices.length) {
-      return paintRadialLines(vertex.connectedVertices[0]);
+  let x = 1;
+  console.clear();
+  for (let i = 0; i < vertices.length / 2; i++) {
+    for (let j = vertices.length - 1; j > vertices.length / 2; j--) {
+      if (vertices[i] !== vertices[j]) {
+        //     const updatedDisputingConnectedVertices: TVertex[] = [];
+        for (let k = 0; k < vertices[i].connectedVertices.length; k++) {
+          for (let l = 0; l < vertices[j].connectedVertices.length; l++) {
+            console.log(x++);
+            //         if (!getLinesColliding(vertices[i], vertices[i].connectedVertices[k], vertices[j], vertices[j].connectedVertices[l])) {
+            //           console.log('not colliding');
+            //           updatedDisputingConnectedVertices.push(vertices[j].connectedVertices[l]);
+            //         }
+          }
+        }
+        //     vertices[j].connectedVertices = updatedDisputingConnectedVertices;
+      }
     }
-    return null;
-  };
-  paintRadialLines(segmentInitialVertex);
-  */
+  }
+
+  // Paints connections
+  vertices.forEach((vertex) => {
+    vertices.forEach((connectionProspectVertex) => {
+      // Paints connection
+      paintContext.beginPath();
+      paintContext.moveTo(vertex.x, vertex.y);
+      paintContext.lineTo(connectionProspectVertex.x, connectionProspectVertex.y);
+      paintContext.lineWidth = 4;
+      paintContext.strokeStyle = '#dddddd22';
+      paintContext.stroke();
+    });
+  });
 };
