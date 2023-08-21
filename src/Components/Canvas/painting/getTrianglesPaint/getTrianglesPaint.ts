@@ -1,3 +1,6 @@
+// ChatGPT solution chat link:
+// https://chat.openai.com/share/63959ce0-e398-481d-8a03-372775557c17
+
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getNewTriangleVertex} from './getNewTriangleVertex';
 import {getDistanceBetweenTwoVertices} from '../../../../utils/getDistanceBetweenTwoVertices';
