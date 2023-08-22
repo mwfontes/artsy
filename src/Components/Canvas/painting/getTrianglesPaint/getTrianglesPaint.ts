@@ -1,12 +1,11 @@
 // ChatGPT solution chat link:
 // https://chat.openai.com/share/63959ce0-e398-481d-8a03-372775557c17
 
+import Delaunator from 'delaunator';
+
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getNewTriangleVertex} from './getNewTriangleVertex';
-import {getDistanceBetweenTwoVertices} from '../../../../utils/getDistanceBetweenTwoVertices';
 import {TVertex} from '../../../../Types';
-import {getClosestVertex} from '../../../../utils/getClosestVertex';
-import {getLinesColliding} from '../../../../utils/getLinesColliding';
 
 interface ITrianglePaint {
   baseContext: CanvasRenderingContext2D;
@@ -16,6 +15,24 @@ interface ITrianglePaint {
   families: number;
   density?: number;
 }
+
+const getAverageColor = (baseContext: CanvasRenderingContext2D, width: number, height: number, ...points: number[][]) => {
+  const colorSum = [0, 0, 0];
+  const pixelCount = points.length;
+  const imageData = baseContext.getImageData(0, 0, width, height);
+
+  for (const point of points) {
+      const [x, y] = point;
+      const index = (y * width + x) * 4;
+      colorSum[0] += imageData.data[index];
+      colorSum[1] += imageData.data[index + 1];
+      colorSum[2] += imageData.data[index + 2];
+  }
+
+  return colorSum.map(sum => Math.floor(sum / pixelCount));
+}
+
+const getArrayOf2DPoints = (vertices: TVertex[]) => vertices.map((vertex) => [vertex.x, vertex.y]);
 
 export const getTrianglesPaint = ({
   baseContext,
@@ -61,53 +78,32 @@ export const getTrianglesPaint = ({
     );
   }
 
-  // Paint vertices
+  // Generates triangles
+  const points = getArrayOf2DPoints(vertices);
+  const delaunatorTriangles = Delaunator.from(points);
+
+  // paints the triangles
+  for (let i = 0; i < delaunatorTriangles.triangles.length; i += 3) {
+    const p1 = points[delaunatorTriangles.triangles[i]];
+    const p2 = points[delaunatorTriangles.triangles[i + 1]];
+    const p3 = points[delaunatorTriangles.triangles[i + 2]];
+
+    paintContext.beginPath();
+    paintContext.moveTo(p1[0], p1[1]);
+    paintContext.lineTo(p2[0], p2[1]);
+    paintContext.lineTo(p3[0], p3[1]);
+    paintContext.closePath();
+
+    const averageColor = getAverageColor(baseContext, width, height, p1, p2, p3);
+    paintContext.fillStyle = `rgb(${averageColor[0]}, ${averageColor[1]}, ${averageColor[2]})`;
+    paintContext.fill();
+}
+
+  // Mark vertices on canvas
   vertices.forEach((vertex) => {
     paintContext.beginPath();
     paintContext.arc(vertex.x, vertex.y, 10, 0, 2 * Math.PI);
     paintContext.fillStyle = 'red';
     paintContext.fill();
-  });
-
-  // builds initial connections (all * all)
-  vertices.forEach((vertex) => {
-    vertices.forEach((connectionProspectVertex) => {
-      if (vertex !== connectionProspectVertex && !connectionProspectVertex.connectedVertices.includes(vertex)) {
-        vertex.connectedVertices.push(connectionProspectVertex);
-      }
-    });
-  });
-
-  let x = 1;
-  console.clear();
-  for (let i = 0; i < vertices.length / 2; i++) {
-    for (let j = vertices.length - 1; j > vertices.length / 2; j--) {
-      if (vertices[i] !== vertices[j]) {
-        //     const updatedDisputingConnectedVertices: TVertex[] = [];
-        for (let k = 0; k < vertices[i].connectedVertices.length; k++) {
-          for (let l = 0; l < vertices[j].connectedVertices.length; l++) {
-            console.log(x++);
-            //         if (!getLinesColliding(vertices[i], vertices[i].connectedVertices[k], vertices[j], vertices[j].connectedVertices[l])) {
-            //           console.log('not colliding');
-            //           updatedDisputingConnectedVertices.push(vertices[j].connectedVertices[l]);
-            //         }
-          }
-        }
-        //     vertices[j].connectedVertices = updatedDisputingConnectedVertices;
-      }
-    }
-  }
-
-  // Paints connections
-  vertices.forEach((vertex) => {
-    vertices.forEach((connectionProspectVertex) => {
-      // Paints connection
-      paintContext.beginPath();
-      paintContext.moveTo(vertex.x, vertex.y);
-      paintContext.lineTo(connectionProspectVertex.x, connectionProspectVertex.y);
-      paintContext.lineWidth = 4;
-      paintContext.strokeStyle = '#dddddd22';
-      paintContext.stroke();
-    });
   });
 };
