@@ -16,21 +16,18 @@ interface ITrianglePaint {
   density?: number;
 }
 
-const getAverageColor = (baseContext: CanvasRenderingContext2D, width: number, height: number, ...points: number[][]) => {
-  const colorSum = [0, 0, 0];
-  const pixelCount = points.length;
-  const imageData = baseContext.getImageData(0, 0, width, height);
+const getAverageColor = (baseContext: CanvasRenderingContext2D, ...points: number[][]) => {
+  const point1ImageData = getBasePixelData(points[0][0], points[0][1], baseContext);
+  const point2ImageData = getBasePixelData(points[1][0], points[1][1], baseContext);
+  const point3ImageData = getBasePixelData(points[2][0], points[2][1], baseContext);
 
-  for (const point of points) {
-      const [x, y] = point;
-      const index = (y * width + x) * 4;
-      colorSum[0] += imageData.data[index];
-      colorSum[1] += imageData.data[index + 1];
-      colorSum[2] += imageData.data[index + 2];
-  }
+  const averageRed = Math.round((point1ImageData[0] + point2ImageData[0] + point3ImageData[0]) / 3);
+  const averageGreen = Math.round((point1ImageData[1] + point2ImageData[1] + point3ImageData[1]) / 3);
+  const averageBlue = Math.round((point1ImageData[2] + point2ImageData[2] + point3ImageData[2]) / 3);
 
-  return colorSum.map(sum => Math.floor(sum / pixelCount));
-}
+  return [averageRed, averageGreen, averageBlue];
+  // return [Math.random() * 255, Math.random() * 255, Math.random() * 255];
+};
 
 const getArrayOf2DPoints = (vertices: TVertex[]) => vertices.map((vertex) => [vertex.x, vertex.y]);
 
@@ -43,16 +40,17 @@ export const getTrianglesPaint = ({
   density = 1,
 }: ITrianglePaint) => {
   const vertices: TVertex[] = [];
-  const stepRatio = Math.round(width / height);
-  const baseDensity = Math.round(families / 10);
-  const centerPoint = {
-    x: Math.round(width / 2),
-    y: Math.round(height / 2),
-  };
+  const borderStepSize = Math.round((width * 2 + height * 2) / families * 5);
+  const basePointsCloudDensity = Math.round(families / 10);
+
+  // Adds initial vertices on all 4 corners
+  vertices.push(getNewTriangleVertex({x: 0, y: 0}));
+  vertices.push(getNewTriangleVertex({x: width, y: 0}));
+  vertices.push(getNewTriangleVertex({x: 0, y: height}));
+  vertices.push(getNewTriangleVertex({x: width, y: height}));
 
   // Build border horizontal vertices
-  const xStepSize = Math.round(width / baseDensity);
-  for (let i = 0; i <= width + xStepSize; i += xStepSize) {
+  for (let i = borderStepSize; i <= width; i += borderStepSize) {
     // Top
     vertices.push(getNewTriangleVertex({x: i, y: 0}));
     // Bottom
@@ -60,8 +58,7 @@ export const getTrianglesPaint = ({
   }
 
   // Build border vertical vertices
-  const yStepSize = height / (baseDensity * stepRatio);
-  for (let i = yStepSize; i <= height; i += yStepSize) {
+  for (let i = borderStepSize; i <= height; i += borderStepSize) {
     // Left
     vertices.push(getNewTriangleVertex({x: 0, y: i}));
     // Right
@@ -69,11 +66,11 @@ export const getTrianglesPaint = ({
   }
 
   // Build center random vertices
-  for (let i = 0; i < baseDensity * 4; i++) {
+  for (let i = 0; i < basePointsCloudDensity * 4; i++) {
     vertices.push(
       getNewTriangleVertex({
-        x: Math.random() * (width - xStepSize * 2) + xStepSize,
-        y: Math.random() * (height - yStepSize * 2) + yStepSize,
+        x: Math.random() * (width - borderStepSize * 2) + borderStepSize,
+        y: Math.random() * (height - borderStepSize * 2) + borderStepSize,
       })
     );
   }
@@ -94,16 +91,8 @@ export const getTrianglesPaint = ({
     paintContext.lineTo(p3[0], p3[1]);
     paintContext.closePath();
 
-    const averageColor = getAverageColor(baseContext, width, height, p1, p2, p3);
+    const averageColor = getAverageColor(baseContext, p1, p2, p3);
     paintContext.fillStyle = `rgb(${averageColor[0]}, ${averageColor[1]}, ${averageColor[2]})`;
     paintContext.fill();
-}
-
-  // Mark vertices on canvas
-  vertices.forEach((vertex) => {
-    paintContext.beginPath();
-    paintContext.arc(vertex.x, vertex.y, 10, 0, 2 * Math.PI);
-    paintContext.fillStyle = 'red';
-    paintContext.fill();
-  });
+  }
 };
