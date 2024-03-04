@@ -1,56 +1,49 @@
-import {getXRotationFunction, TRotationFunction} from './getXRotationFunction';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 
 export type TSpiralNode = {
   x: number;
   y: number;
   deg: number;
-  step: number;
   directionMultiplierX: number;
   directionMultiplierY: number;
   speedRatio: number;
   lineStepLimit: number;
-  descendant: number;
   lineWidth: number;
   color: {
     r: number;
     g: number;
     b: number;
   };
-  xRotationFunction: TRotationFunction;
 };
 
 interface ISpiralNode {
   baseContext: CanvasRenderingContext2D;
   width: number;
   height: number;
-  node?: TSpiralNode;
+  parentNode?: TSpiralNode;
   lineWidth: number;
 }
 
-export const getNewSpiralsNode = ({baseContext, width, height, node, lineWidth}: ISpiralNode): TSpiralNode => {
-  const newX = Math.floor(Math.random() * width);
-  const newY = Math.floor(Math.random() * height);
-  const newDeg = Math.random() * 2 * Math.PI;
+export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineWidth}: ISpiralNode): TSpiralNode => {
+  const startingX = width / 2; // Math.floor(Math.random() * width);
+  const startingY = height / 2; // Math.floor(Math.random() * height);
+  const startingDeg = Math.random() * 2 * Math.PI;
 
-  const imagePixelColor = getBasePixelData(node?.x || newX, node?.y || newY, baseContext);
+  const imagePixelColor = getBasePixelData(parentNode?.x || startingX, parentNode?.y || startingY, baseContext);
 
   return {
-    x: node?.x || newX,
-    y: node?.y || newY,
-    deg: newDeg,
-    step: 0,
-    directionMultiplierX: Math.floor(Math.random() * 2) || -1, // -1 or 1
-    directionMultiplierY: Math.floor(Math.random() * 2) || -1, // -1 or 1
+    x: parentNode?.x || startingX,
+    y: parentNode?.y || startingY,
+    deg: parentNode?.deg || startingDeg,
+    directionMultiplierX: Math.random() > 0.5 ? 1 : -1, // -1 or 1
+    directionMultiplierY: Math.random() > 0.5 ? 1 : -1, // -1 or 1
     speedRatio: Math.random(),
-    lineStepLimit: Math.random() * 300,
-    descendant: node?.descendant || 0,
-    lineWidth: node?.lineWidth || lineWidth,
+    lineStepLimit: Math.floor(Math.random() * 200 + 100), // 100 to 300
+    lineWidth: parentNode?.lineWidth || lineWidth,
     color: {
-      r: node?.color.r || imagePixelColor[0],
-      g: node?.color.g || imagePixelColor[1],
-      b: node?.color.b || imagePixelColor[2],
+      r: parentNode?.color.r || imagePixelColor[0],
+      g: parentNode?.color.g || imagePixelColor[1],
+      b: parentNode?.color.b || imagePixelColor[2],
     },
-    xRotationFunction: node?.xRotationFunction || getXRotationFunction(),
   };
 };

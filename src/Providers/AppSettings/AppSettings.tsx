@@ -11,28 +11,36 @@ export enum EPaintType {
   HYBRID_SPIRALS_GRADIENT_LINES = 'Spirals & Gradient lines',
 }
 
+export enum EResolution {
+  VERY_LOW = 'Very low',
+  LOW = 'Low',
+  MEDIUM = 'Medium',
+  HIGH = ' High',
+  VERY_HIGH = 'Very high',
+}
+
 export type IAppSettings = {
-  families: number;
+  resolution: EResolution;
   paintType: EPaintType;
-  setFamilies(families: number): void;
+  setResolution(resolution: EResolution): void;
   setPaintType(paintType: EPaintType): void;
 };
 
 const SettingsContext = createContext<IAppSettings>({
-  families: 1,
+  resolution: EResolution.MEDIUM,
   paintType: EPaintType.SLASH_LINES,
-  setFamilies: () => {},
+  setResolution: () => {},
   setPaintType: () => {},
 });
 
 export const appSettings = (from?: string): IAppSettings => {
-  const [families, setFamilies] = useState<number>(1);
+  const [resolution, setResolution] = useState<EResolution>(EResolution.MEDIUM);
   const [paintType, setPaintType] = useState<EPaintType>(EPaintType.SLASH_LINES);
 
   return {
-    families,
+    resolution,
     paintType,
-    setFamilies,
+    setResolution,
     setPaintType,
   };
 };

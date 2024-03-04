@@ -13,10 +13,10 @@ function App() {
   const baseCanvasRef = useRef<HTMLCanvasElement>();
   const baseContextRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  const {families, paintType, setFamilies, setPaintType} = appSettings();
+  const {resolution, paintType, setResolution, setPaintType} = appSettings();
 
   const updateOrLoadImage = (imageUrl: string) => {
-    if (!imageUrl || families <= 0) {
+    if (!imageUrl) {
       return;
     }
 
@@ -27,24 +27,33 @@ function App() {
     baseCanvasRef.current = document.createElement('canvas');
     baseCanvasRef.current.width = 2480;
     baseCanvasRef.current.height = 3508;
-    baseContextRef.current = baseCanvasRef.current.getContext('2d');
+    baseContextRef.current = baseCanvasRef.current.getContext('2d', {
+      alpha: false,
+      desynchronized: true,
+      willReadFrequently: false,
+      colorSpace: 'srgb',
+    });
 
     baseImageRef.current.onload = () => {
-      baseContextRef.current!.drawImage(baseImageRef.current!, 0, 0, 2480, 3508);
+      baseContextRef.current!.drawImage(
+        baseImageRef.current!,
+        0,
+        0,
+        baseCanvasRef.current!.width,
+        baseCanvasRef.current!.height
+      );
       setIsImageLoaded(true);
     };
   };
 
   return (
-    <SettingsContext.Provider
-      value={{families, paintType, setFamilies, setPaintType}}
-    >
+    <SettingsContext.Provider value={{resolution, paintType, setResolution, setPaintType}}>
       <div className={cx(styles.component)}>
         <Settings onApply={updateOrLoadImage} />
         {isImageLoaded && (
           <Canvas
-            width={2480}
-            height={3508}
+            width={baseCanvasRef.current!.width}
+            height={baseCanvasRef.current!.height}
             baseContext={baseContextRef.current!}
           />
         )}

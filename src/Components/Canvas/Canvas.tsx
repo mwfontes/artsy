@@ -20,96 +20,105 @@ export interface ICanvas {
 }
 
 function Canvas({width, height, baseContext}: ICanvas) {
-  const {families, paintType} = useAppSettings();
+  const {resolution, paintType} = useAppSettings();
   const canvas = createRef<HTMLCanvasElement>();
   const ctx = useRef<CanvasRenderingContext2D>();
   const screenRatio = width > height ? height / width : width / height;
 
   useEffect(() => {
-    if (canvas.current) {
-      ctx.current = canvas.current?.getContext('2d')!;
+    if (canvas.current && baseContext) {
+      ctx.current = canvas.current.getContext('2d', {
+        alpha: false,
+        desynchronized: true,
+        willReadFrequently: false,
+        colorSpace: 'srgb',
+      })!;
+      // Clears canvas with white colour
+      ctx.current.fillStyle = 'white';
+      ctx.current.fillRect(0, 0, width, height);
+
       setTimeout(() => {
         if (paintType === EPaintType.SPIRALS) {
           getSpiralsPaint({
-            baseContext: baseContext!,
+            baseContext: baseContext,
             paintContext: ctx.current!,
-            families,
+            resolution,
             screenRatio,
             width,
             height,
           });
         }
-        if (paintType === EPaintType.GRADIENT_LINES) {
-          getGradientLinesPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            width,
-            height,
-          });
-        }
-        if (paintType === EPaintType.HYBRID_SPIRALS_GRADIENT_LINES) {
-          getSpiralsPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            screenRatio,
-            width,
-            height,
-          });
-        }
-        if (paintType === EPaintType.HORIZONTAL_LINES) {
-          getHorizontalLinesPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            width,
-            height,
-          });
-        }
-        if (paintType === EPaintType.VERTICAL_LINES) {
-          getVerticalLinesPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            width,
-            height,
-            density: 1,
-          });
-        }
-        if (paintType === EPaintType.HYBRID_HORIZONTAL_VERTICAL_LINES) {
-          getHorizontalVerticalLinesPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            width,
-            height,
-            density: 1,
-          });
-        }
-        if (paintType === EPaintType.SLASH_LINES) {
-          getSlashLinesPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            width,
-            height,
-            density: 1,
-          });
-        }
-        if (paintType === EPaintType.TRIANGLES) {
-          getTrianglesPaint({
-            baseContext: baseContext!,
-            paintContext: ctx.current!,
-            families,
-            width,
-            height,
-            density: 1,
-          });
-        }
-      }, 1000);
+        // if (paintType === EPaintType.GRADIENT_LINES) {
+        //   getGradientLinesPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     width,
+        //     height,
+        //   });
+        // }
+        // if (paintType === EPaintType.HYBRID_SPIRALS_GRADIENT_LINES) {
+        //   getSpiralsPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     screenRatio,
+        //     width,
+        //     height,
+        //   });
+        // }
+        // if (paintType === EPaintType.HORIZONTAL_LINES) {
+        //   getHorizontalLinesPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     width,
+        //     height,
+        //   });
+        // }
+        // if (paintType === EPaintType.VERTICAL_LINES) {
+        //   getVerticalLinesPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     width,
+        //     height,
+        //     density: 1,
+        //   });
+        // }
+        // if (paintType === EPaintType.HYBRID_HORIZONTAL_VERTICAL_LINES) {
+        //   getHorizontalVerticalLinesPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     width,
+        //     height,
+        //     density: 1,
+        //   });
+        // }
+        // if (paintType === EPaintType.SLASH_LINES) {
+        //   getSlashLinesPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     width,
+        //     height,
+        //     density: 1,
+        //   });
+        // }
+        // if (paintType === EPaintType.TRIANGLES) {
+        //   getTrianglesPaint({
+        //     baseContext: baseContext!,
+        //     paintContext: ctx.current!,
+        //     resolution,
+        //     width,
+        //     height,
+        //     density: 1,
+        //   });
+        // }
+      }, 1);
     }
-  }, [canvas, baseContext, ctx, families, screenRatio, width, height]);
+  }, [canvas, baseContext, ctx, resolution, screenRatio, width, height]);
 
   return <canvas className={cx(styles.component)} width={width} height={height} ref={canvas} />;
 }

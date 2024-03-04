@@ -1,3 +1,4 @@
+import {EResolution} from '../../../../Providers/AppSettings/AppSettings';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getNewGradientLinesNode, TLineNode} from './getNewGradientLinesNode';
 
@@ -6,15 +7,39 @@ interface ILinePaint {
   paintContext: CanvasRenderingContext2D;
   width: number;
   height: number;
-  families: number;
+  resolution: EResolution;
   density?: number;
 }
 
-export const getGradientLinesPaint = ({baseContext, paintContext, width, height, families, density = 1}: ILinePaint) => {
+export const getGradientLinesPaint = ({
+  baseContext,
+  paintContext,
+  width,
+  height,
+  resolution,
+  density = 1,
+}: ILinePaint) => {
   const lineWidth = 20;
   const lineSegmentsSteps = 10;
   let currentFamily = 0;
   let node: TLineNode = getNewGradientLinesNode({width, height});
+
+  const getResolution = () => {
+    switch (resolution) {
+      case EResolution.VERY_LOW:
+        return 100;
+      case EResolution.LOW:
+        return 300;
+      case EResolution.MEDIUM:
+        return 500;
+      case EResolution.HIGH:
+        return 750;
+      case EResolution.VERY_HIGH:
+        return 1000;
+      default:
+        return 500;
+    }
+  };
 
   do {
     const {originX, originY, x: destinationX, y: destinationY} = node;
@@ -45,5 +70,5 @@ export const getGradientLinesPaint = ({baseContext, paintContext, width, height,
 
     node = getNewGradientLinesNode({width, height, originX: destinationX, originY: destinationY});
     currentFamily++;
-  } while (currentFamily <= families * 80);
+  } while (currentFamily <= getResolution());
 };

@@ -1,12 +1,13 @@
 import {getSpiralsPaint} from '../getSpiralsPaint/getSpiralsPaint';
 import {getGradientLinesPaint} from '../getGradientLinesPaint/getGradientLinesPaint';
+import {EResolution} from '../../../../Providers/AppSettings/AppSettings';
 
 interface IGetSpiralLinePaint {
   baseContext: CanvasRenderingContext2D;
   paintContext: CanvasRenderingContext2D;
   width: number;
   height: number;
-  families: number;
+  resolution: EResolution;
   density?: number;
   screenRatio: number;
 }
@@ -16,20 +17,20 @@ export const getSpiralsGradientLinesPaint = ({
   paintContext,
   width,
   height,
-  families,
+  resolution,
   screenRatio,
 }: IGetSpiralLinePaint) => {
   getGradientLinesPaint({
     baseContext,
     paintContext,
-    families: families / 4,
+    resolution,
     width,
     height,
   });
   getSpiralsPaint({
     baseContext,
     paintContext,
-    families: families / 2,
+    resolution,
     screenRatio,
     width,
     height,
@@ -37,7 +38,7 @@ export const getSpiralsGradientLinesPaint = ({
   getGradientLinesPaint({
     baseContext,
     paintContext,
-    families: families / 100,
+    resolution,
     width,
     height,
     density: 0.15,
