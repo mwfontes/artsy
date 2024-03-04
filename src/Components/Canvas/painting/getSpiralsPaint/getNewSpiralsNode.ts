@@ -6,8 +6,7 @@ export type TSpiralNode = {
   deg: number;
   directionMultiplierX: number;
   directionMultiplierY: number;
-  speedRatio: number;
-  lineStepLimit: number;
+  spiralSize: number;
   lineWidth: number;
   color: {
     r: number;
@@ -25,9 +24,11 @@ interface ISpiralNode {
 }
 
 export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineWidth}: ISpiralNode): TSpiralNode => {
-  const startingX = width / 2; // Math.floor(Math.random() * width);
-  const startingY = height / 2; // Math.floor(Math.random() * height);
+  const startingX = Math.floor(Math.random() * width);
+  const startingY = Math.floor(Math.random() * height);
   const startingDeg = Math.random() * 2 * Math.PI;
+  const minimumSpiralSize = width > height ? width / 16 : height / 16;
+  const spiralSize = (width > height ? width / 4 : height / 4) - minimumSpiralSize;
 
   const imagePixelColor = getBasePixelData(parentNode?.x || startingX, parentNode?.y || startingY, baseContext);
 
@@ -37,8 +38,7 @@ export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineW
     deg: parentNode?.deg || startingDeg,
     directionMultiplierX: Math.random() > 0.5 ? 1 : -1, // -1 or 1
     directionMultiplierY: Math.random() > 0.5 ? 1 : -1, // -1 or 1
-    speedRatio: Math.random(),
-    lineStepLimit: Math.floor(Math.random() * 200 + 100), // 100 to 300
+    spiralSize: Math.floor(Math.random() * spiralSize + minimumSpiralSize),
     lineWidth: parentNode?.lineWidth || lineWidth,
     color: {
       r: parentNode?.color.r || imagePixelColor[0],

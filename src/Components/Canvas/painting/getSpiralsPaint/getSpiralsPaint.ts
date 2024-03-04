@@ -45,17 +45,17 @@ const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, 
 const getResolution = (resolution: EResolution) => {
   switch (resolution) {
     case EResolution.VERY_LOW:
-      return 1;
+      return 100;
     case EResolution.LOW:
-      return 3;
+      return 300;
     case EResolution.MEDIUM:
-      return 5;
+      return 500;
     case EResolution.HIGH:
-      return 7;
+      return 700;
     case EResolution.VERY_HIGH:
-      return 10;
+      return 1000;
     default:
-      return 50;
+      return 500;
   }
 };
 
@@ -80,33 +80,22 @@ export const getSpiralsPaint = ({
 
   // for each node, draw the next lines
   nodes.forEach((node, i) => {
-    const {x, y, deg, speedRatio, lineStepLimit, directionMultiplierX, directionMultiplierY, lineWidth} = node;
-
+    const {x, y, deg, spiralSize, directionMultiplierX, directionMultiplierY, lineWidth} = node;
+    let currentSpiralSize = 0;
+    let baseColor = getBaseColor(node, baseContext, currentSpiralSize);
+    const screenRatio = width > height ? height / width : width / height;
+    const stepSize: number = 1;
     // draws the spiral from current node
-    for (let currentStep = 0; currentStep < lineStepLimit; currentStep++) {
-      const expantionRatio = width > height ? height / width : width / height;
-      const stepSize: number = 1000;
-      const newDeg = deg + currentStep * (1 / (currentStep + 1));
-      // consultar algoritmo de espiral outwards
+    paintContext.beginPath();
+    paintContext.moveTo(x, y); // starting point
+    do {
+      const newDeg = deg + currentSpiralSize * ((Math.PI * 8) / spiralSize);
+      const newX = x + currentSpiralSize * Math.cos(newDeg) * directionMultiplierX;
+      const newY = y + currentSpiralSize * Math.sin(newDeg) * directionMultiplierY;
 
-      // generates new positioning values
-      const newX = x + Math.cos(newDeg) * stepSize * directionMultiplierX;
-      const newY = y + Math.sin(newDeg) * stepSize * directionMultiplierY;
+      baseColor = getBaseColor(node, baseContext, currentSpiralSize);
 
-      const baseColor = getBaseColor(node, baseContext, currentStep);
-
-      // Paints on canvas
-      if (currentStep === 0) {
-        paintContext.beginPath();
-        paintContext.moveTo(x, y); // starting point
-      }
       paintContext.lineTo(newX, newY);
-      if (currentStep === lineStepLimit - 1) {
-        paintContext.strokeStyle = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
-        paintContext.lineWidth = lineWidth;
-        paintContext.lineCap = 'round';
-        paintContext.stroke();
-      }
 
       // Initial blocks
       /*
@@ -126,7 +115,12 @@ export const getSpiralsPaint = ({
       // x = newX;
       // y = newY;
       // deg = newDeg;
-    }
+      currentSpiralSize += stepSize;
+    } while (currentSpiralSize < spiralSize);
+    paintContext.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+    paintContext.lineWidth = lineWidth;
+    paintContext.lineCap = 'round';
+    paintContext.stroke();
 
     // fires painting of descendants if ends painting parent
     /*
