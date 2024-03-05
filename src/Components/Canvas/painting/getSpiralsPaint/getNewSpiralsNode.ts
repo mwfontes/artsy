@@ -38,7 +38,7 @@ export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineW
     deg: parentNode?.deg || startingDeg,
     directionMultiplierX: Math.random() > 0.5 ? 1 : -1, // -1 or 1
     directionMultiplierY: Math.random() > 0.5 ? 1 : -1, // -1 or 1
-    spiralSize: Math.floor(Math.random() * spiralSize + minimumSpiralSize),
+    spiralSize: (parentNode?.spiralSize || 0) + Math.floor(Math.random() * spiralSize + minimumSpiralSize),
     lineWidth: parentNode?.lineWidth || lineWidth,
     color: {
       r: parentNode?.color.r || imagePixelColor[0],
