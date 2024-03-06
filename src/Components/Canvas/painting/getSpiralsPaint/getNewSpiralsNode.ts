@@ -35,7 +35,7 @@ export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineW
   return {
     x: parentNode?.x || startingX,
     y: parentNode?.y || startingY,
-    deg: parentNode?.deg || startingDeg,
+    deg: startingDeg,
     directionMultiplierX: Math.random() > 0.5 ? 1 : -1, // -1 or 1
     directionMultiplierY: Math.random() > 0.5 ? 1 : -1, // -1 or 1
     spiralSize: (parentNode?.spiralSize || 0) + Math.floor(Math.random() * spiralSize + minimumSpiralSize),

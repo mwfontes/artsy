@@ -26,9 +26,9 @@ const initialLineWidth = 20;
 const maxBlockNodes = 10;
 const blockNodeInterval = 5;
 // number of steps before reading new color from base image
-const stepsPerColor = 10;
+const stepsPerColor = 128;
 const numberOfDescendants = 3;
-const numberOfPasses = 1;
+const numberOfPasses = 3;
 
 const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, step: number): TColor => {
   const {color} = node;
@@ -46,17 +46,17 @@ const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, 
 const getResolution = (resolution: EResolution) => {
   switch (resolution) {
     case EResolution.VERY_LOW:
-      return 32;
+      return 4;
     case EResolution.LOW:
-      return 64;
+      return 8;
     case EResolution.MEDIUM:
-      return 128;
+      return 16;
     case EResolution.HIGH:
-      return 256;
+      return 32;
     case EResolution.VERY_HIGH:
-      return 512;
+      return 64;
     default:
-      return 128;
+      return 16;
   }
 };
 
@@ -74,7 +74,7 @@ export const getSpiralsPaint = ({
     return;
   }
 
-  for (let currentPass = 1; currentPass >= numberOfPasses; currentPass++) {
+  for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     // creates nodes based on resolution.
     // 1 resultion point = 1 new node (spiral line)
     const nodes = [...new Array(isDescendants ? numberOfDescendants : getResolution(resolution))].map((_newItem) =>
@@ -83,23 +83,18 @@ export const getSpiralsPaint = ({
 
     // for each node, draw the next lines
     nodes.forEach((node, i) => {
-      const {spiralSize, directionMultiplierX, directionMultiplierY, lineWidth} = node;
-      let {x, y, deg} = node;
-      let currentSpiralSize = 1;
+      const {x, y, deg, spiralSize, directionMultiplierX, directionMultiplierY, lineWidth, color} = node;
+      let currentSpiralSize = 0;
       let baseColor = getBaseColor(node, baseContext, currentSpiralSize);
-      const screenRatio = width > height ? height / width : width / height;
       const stepSize: number = 4;
       const descendantValues = {
         x,
         y,
-        deg,
         lineWidth,
         spiralSize,
+        color,
       };
 
-      // draws the spiral from current node
-      paintContext.beginPath();
-      paintContext.moveTo(x, y); // starting point
       do {
         const spiralGrowingCurve = isDescendants ? 1 : currentSpiralSize / spiralSize;
         const numberOfRevolutions = isDescendants ? 0.5 : 4;
@@ -117,9 +112,16 @@ export const getSpiralsPaint = ({
             (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
             directionMultiplierY;
 
-        baseColor = getBaseColor(node, baseContext, currentSpiralSize);
+        baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize);
 
+        // draws the spiral from current node
+        paintContext.beginPath();
+        paintContext.moveTo(descendantValues.x, descendantValues.y); // starting point
         paintContext.lineTo(newX, newY);
+        paintContext.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+        paintContext.lineWidth = lineWidth;
+        paintContext.lineCap = 'round';
+        paintContext.stroke();
 
         // Initial blocks
         /*
@@ -139,14 +141,11 @@ export const getSpiralsPaint = ({
         descendantValues.x = newX;
         descendantValues.y = newY;
         descendantValues.lineWidth = lineWidth / 2;
-        descendantValues.spiralSize = spiralSize;
+        descendantValues.spiralSize = spiralSize / currentPass;
+        descendantValues.color = baseColor;
 
         currentSpiralSize += stepSize;
-      } while (currentSpiralSize < spiralSize);
-      paintContext.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
-      paintContext.lineWidth = lineWidth;
-      paintContext.lineCap = 'round';
-      paintContext.stroke();
+      } while (currentSpiralSize < spiralSize / currentPass);
 
       // fires painting of descendants if ends painting parent
       if (!isDescendants) {

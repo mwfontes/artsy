@@ -9,9 +9,10 @@ import {getHorizontalVerticalLinesPaint} from './painting/hybrids/getHorizontalV
 import {getSpiralsGradientLinesPaint} from './painting/hybrids/getSpiralLinePaint';
 import {getSlashLinesPaint} from './painting/getSlashLinesPaint/getSlashLinesPaint';
 import {EPaintType, useAppSettings} from '../../Providers/AppSettings/AppSettings';
+import {getTrianglesPaint} from './painting/getTrianglesPaint/getTrianglesPaint';
+import {getAverageColor} from '../../utils/getAverageColor';
 
 import styles from './Canvas.styles';
-import {getTrianglesPaint} from './painting/getTrianglesPaint/getTrianglesPaint';
 
 export interface ICanvas {
   width: number;
@@ -33,20 +34,22 @@ function Canvas({width, height, baseContext}: ICanvas) {
         willReadFrequently: false,
         colorSpace: 'srgb',
       })!;
-      // Clears canvas with white colour
-      ctx.current.fillStyle = 'white';
+      // Clears canvas with average colour
+      const {r, g, b} = getAverageColor(baseContext);
+      ctx.current.fillStyle = `rgb(${r}, ${g}, ${b})`;
       ctx.current.fillRect(0, 0, width, height);
 
       setTimeout(() => {
         if (paintType === EPaintType.SPIRALS) {
-          getSpiralsPaint({
-            baseContext: baseContext,
-            paintContext: ctx.current!,
-            resolution,
-            screenRatio,
-            width,
-            height,
-          });
+          ctx.current!.drawImage(baseContext.canvas, 0, 0, width, height);
+          // getSpiralsPaint({
+          //   baseContext: baseContext,
+          //   paintContext: ctx.current!,
+          //   resolution,
+          //   screenRatio,
+          //   width,
+          //   height,
+          // });
         }
         // if (paintType === EPaintType.GRADIENT_LINES) {
         //   getGradientLinesPaint({
