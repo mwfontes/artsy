@@ -2,22 +2,18 @@ import React, {useState, useRef} from 'react';
 import {cx} from '@emotion/css';
 import Canvas from './Components/Canvas/Canvas';
 import Settings from './Components/Settings/Settings';
-import SettingsContext, {appSettings, useAppSettings} from './Providers/AppSettings/AppSettings';
+import SettingsContext, {appSettings} from './Providers/AppSettings/AppSettings';
 
 import './styles/global.styles';
 import styles from './App.styles';
 
 function App() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const baseImageRef = useRef<HTMLImageElement>();
+  const loadedImageRef = useRef<HTMLImageElement>();
   const baseCanvasRef = useRef<HTMLCanvasElement>();
   const baseContextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const {resolution, paintType, setResolution, setPaintType} = appSettings();
-
-  const renderSizes = {
-    a4: {width: 2480, height: 3508},
-  };
 
   const updateOrLoadImage = (imageUrl: string) => {
     if (!imageUrl) {
@@ -26,10 +22,8 @@ function App() {
 
     setIsImageLoaded(false);
 
-    baseImageRef.current = new Image();
+    loadedImageRef.current = new Image();
     baseCanvasRef.current = document.createElement('canvas');
-    baseCanvasRef.current.width = renderSizes.a4.width;
-    baseCanvasRef.current.height = renderSizes.a4.height;
     baseContextRef.current = baseCanvasRef.current.getContext('2d', {
       alpha: false,
       desynchronized: true,
@@ -37,38 +31,22 @@ function App() {
       colorSpace: 'srgb',
     });
 
-    baseImageRef.current.onload = () => {
-      const sWidth = baseImageRef.current!.width;
-      const sHeight = baseImageRef.current!.height;
-      const dWidth = renderSizes.a4.width;
-      const dHeight = renderSizes.a4.height;
+    loadedImageRef.current.onload = () => {
+      const maxRenderDimension = 1000;
+      const sWidth = loadedImageRef.current!.width;
+      const sHeight = loadedImageRef.current!.height;
       const sourceImageRatio = sWidth / sHeight;
-      const renderImageRatio = renderSizes.a4.width / renderSizes.a4.height;
-      const ratioDifference = sourceImageRatio / renderImageRatio;
-      const isRenderImageLandscape = dWidth > dHeight;
-      console.log(
-        'source - render - ratio',
-        sourceImageRatio,
-        renderImageRatio,
-        ratioDifference,
-        isRenderImageLandscape
-      );
-      baseContextRef.current!.drawImage(
-        baseImageRef.current!,
-        0,
-        0,
-        sWidth,
-        sHeight,
-        isRenderImageLandscape ? 0 : dWidth / 2 - (dHeight / 2) * ratioDifference,
-        isRenderImageLandscape ? dHeight / ratioDifference : 0,
-        isRenderImageLandscape ? 0 : dWidth / 2 + (dHeight / 2) * ratioDifference,
-        isRenderImageLandscape ? dHeight / ratioDifference : dHeight
-      );
+      const dWidth = sWidth > sHeight ? maxRenderDimension : maxRenderDimension / sourceImageRatio;
+      const dHeight = sHeight > sWidth ? maxRenderDimension : maxRenderDimension / sourceImageRatio;
+
+      baseCanvasRef.current!.width = dWidth;
+      baseCanvasRef.current!.height = dHeight;
+      baseContextRef.current!.drawImage(loadedImageRef.current!, 0, 0, dWidth, dHeight);
       setIsImageLoaded(true);
     };
 
     // loads image
-    baseImageRef.current.src = imageUrl;
+    loadedImageRef.current.src = imageUrl;
   };
 
   return (

@@ -1,3 +1,5 @@
+import Two from 'two.js';
+
 import {getNewSpiralsNode, TSpiralNode} from './getNewSpiralsNode';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getIsOutOfBounds} from '../../../../utils/getIsOutOfBounds';
@@ -6,7 +8,7 @@ import {EResolution} from '../../../../Providers/AppSettings/AppSettings';
 
 interface ISpiralPaint {
   baseContext: CanvasRenderingContext2D;
-  paintContext: CanvasRenderingContext2D;
+  canvasElement: HTMLDivElement;
   width: number;
   height: number;
   screenRatio: number;
@@ -46,23 +48,23 @@ const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, 
 const getResolution = (resolution: EResolution) => {
   switch (resolution) {
     case EResolution.VERY_LOW:
-      return 4;
+      return 16;
     case EResolution.LOW:
-      return 8;
-    case EResolution.MEDIUM:
-      return 16;
-    case EResolution.HIGH:
       return 32;
-    case EResolution.VERY_HIGH:
+    case EResolution.MEDIUM:
       return 64;
+    case EResolution.HIGH:
+      return 128;
+    case EResolution.VERY_HIGH:
+      return 256;
     default:
-      return 16;
+      return 64;
   }
 };
 
 export const getSpiralsPaint = ({
   baseContext,
-  paintContext,
+  canvasElement,
   width,
   height,
   screenRatio,
@@ -70,9 +72,12 @@ export const getSpiralsPaint = ({
   isDescendants,
   parentNode,
 }: ISpiralPaint) => {
-  if (!paintContext) {
+  if (!canvasElement) {
     return;
   }
+
+  canvasElement.innerHTML = '';
+  var paintCanvas = new Two({width, height, type: Two.Types.svg}).appendTo(canvasElement);
 
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     // creates nodes based on resolution.
@@ -94,6 +99,10 @@ export const getSpiralsPaint = ({
         spiralSize,
         color,
       };
+      // let currentPath = new Two.Path();
+      // currentPath.linewidth = 2;
+      // currentPath.noFill();
+      // currentPath.automatic = false;
 
       do {
         const spiralGrowingCurve = isDescendants ? 1 : currentSpiralSize / spiralSize;
@@ -115,13 +124,16 @@ export const getSpiralsPaint = ({
         baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize);
 
         // draws the spiral from current node
-        paintContext.beginPath();
-        paintContext.moveTo(descendantValues.x, descendantValues.y); // starting point
-        paintContext.lineTo(newX, newY);
-        paintContext.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
-        paintContext.lineWidth = lineWidth;
-        paintContext.lineCap = 'round';
-        paintContext.stroke();
+        paintCanvas.makeLine(descendantValues.x, descendantValues.y, newX, newY);
+        /*
+        paintCanvas.beginPath();
+        paintCanvas.moveTo(descendantValues.x, descendantValues.y); // starting point
+        paintCanvas.lineTo(newX, newY);
+        paintCanvas.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+        paintCanvas.lineWidth = lineWidth;
+        paintCanvas.lineCap = 'round';
+        paintCanvas.stroke();
+        */
 
         // Initial blocks
         /*
@@ -151,7 +163,7 @@ export const getSpiralsPaint = ({
       if (!isDescendants) {
         getSpiralsPaint({
           baseContext,
-          paintContext,
+          canvasElement,
           width,
           height,
           screenRatio,
@@ -162,4 +174,5 @@ export const getSpiralsPaint = ({
       }
     });
   }
+  paintCanvas.update();
 };

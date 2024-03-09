@@ -1,5 +1,6 @@
 import React, {createRef, useRef, useEffect} from 'react';
 import {cx} from '@emotion/css';
+import Two from 'two.js';
 
 import {getSpiralsPaint} from './painting/getSpiralsPaint/getSpiralsPaint';
 import {getGradientLinesPaint} from './painting/getGradientLinesPaint/getGradientLinesPaint';
@@ -22,34 +23,36 @@ export interface ICanvas {
 
 function Canvas({width, height, baseContext}: ICanvas) {
   const {resolution, paintType} = useAppSettings();
-  const canvas = createRef<HTMLCanvasElement>();
-  const ctx = useRef<CanvasRenderingContext2D>();
-  const screenRatio = width > height ? height / width : width / height;
+  // const canvas = createRef<HTMLCanvasElement>();
+  const canvas = createRef<HTMLDivElement>();
+  // const ctx = useRef<CanvasRenderingContext2D>();
+  const screenRatio = width / height;
 
   useEffect(() => {
     if (canvas.current && baseContext) {
-      ctx.current = canvas.current.getContext('2d', {
-        alpha: false,
-        desynchronized: true,
-        willReadFrequently: false,
-        colorSpace: 'srgb',
-      })!;
+      // ctx.current = canvas.current.getContext('2d', {
+      //   alpha: false,
+      //   desynchronized: true,
+      //   willReadFrequently: false,
+      //   colorSpace: 'srgb',
+      // })!;
       // Clears canvas with average colour
       const {r, g, b} = getAverageColor(baseContext);
-      ctx.current.fillStyle = `rgb(${r}, ${g}, ${b})`;
-      ctx.current.fillRect(0, 0, width, height);
+      // ctx.current.fillStyle = `rgb(${r}, ${g}, ${b})`;
+      // ctx.current.fillRect(0, 0, width, height);
 
       setTimeout(() => {
         if (paintType === EPaintType.SPIRALS) {
-          ctx.current!.drawImage(baseContext.canvas, 0, 0, width, height);
-          // getSpiralsPaint({
-          //   baseContext: baseContext,
-          //   paintContext: ctx.current!,
-          //   resolution,
-          //   screenRatio,
-          //   width,
-          //   height,
-          // });
+          // ctx.current!.drawImage(baseContext.canvas, 0, 0, width, height);
+          getSpiralsPaint({
+            baseContext: baseContext,
+            // paintContext: ctx.current!,
+            canvasElement: canvas.current!,
+            resolution,
+            screenRatio,
+            width,
+            height,
+          });
         }
         // if (paintType === EPaintType.GRADIENT_LINES) {
         //   getGradientLinesPaint({
@@ -121,9 +124,10 @@ function Canvas({width, height, baseContext}: ICanvas) {
         // }
       }, 1);
     }
-  }, [canvas, baseContext, ctx, resolution, screenRatio, width, height]);
+  }, [canvas, baseContext, canvas, resolution, screenRatio, width, height]);
 
-  return <canvas className={cx(styles.component)} width={width} height={height} ref={canvas} />;
+  // return <canvas className={cx(styles.component)} width={width} height={height} ref={canvas} />;
+  return <div className={cx(styles.component)} ref={canvas} />;
 }
 
 export default Canvas;

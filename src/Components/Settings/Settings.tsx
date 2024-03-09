@@ -14,6 +14,7 @@ function Settings({onApply}: ISettings) {
   const familiesInputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const typeSelectRef = React.useRef<HTMLSelectElement>(null);
+  const renderSizeSelectRef = React.useRef<HTMLSelectElement>(null);
 
   const handleApply = () => {
     if (!fileInputRef.current!.files || fileInputRef.current!.files.length === 0) {

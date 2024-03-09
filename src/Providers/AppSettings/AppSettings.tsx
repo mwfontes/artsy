@@ -21,8 +21,8 @@ export enum EResolution {
 
 export type IAppSettings = {
   resolution: EResolution;
-  paintType: EPaintType;
   setResolution(resolution: EResolution): void;
+  paintType: EPaintType;
   setPaintType(paintType: EPaintType): void;
 };
 

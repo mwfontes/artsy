@@ -27,14 +27,14 @@ export const getSpiralsGradientLinesPaint = ({
     width,
     height,
   });
-  getSpiralsPaint({
-    baseContext,
-    paintContext,
-    resolution,
-    screenRatio,
-    width,
-    height,
-  });
+  // getSpiralsPaint({
+  //   baseContext,
+  //   canvasElement,
+  //   resolution,
+  //   screenRatio,
+  //   width,
+  //   height,
+  // });
   getGradientLinesPaint({
     baseContext,
     paintContext,
