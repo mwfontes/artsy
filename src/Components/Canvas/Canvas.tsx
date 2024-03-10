@@ -30,16 +30,10 @@ function Canvas({width, height, baseContext}: ICanvas) {
 
   useEffect(() => {
     if (canvas.current && baseContext) {
-      // ctx.current = canvas.current.getContext('2d', {
-      //   alpha: false,
-      //   desynchronized: true,
-      //   willReadFrequently: false,
-      //   colorSpace: 'srgb',
-      // })!;
       // Clears canvas with average colour
       const {r, g, b} = getAverageColor(baseContext);
-      // ctx.current.fillStyle = `rgb(${r}, ${g}, ${b})`;
-      // ctx.current.fillRect(0, 0, width, height);
+      var paintCanvas = new Two({width, height, type: Two.Types.svg}).appendTo(canvas.current);
+      paintCanvas.makeRectangle(width / 2, height / 2, width, height).fill = `rgb(${r}, ${g}, ${b})`;
 
       setTimeout(() => {
         if (paintType === EPaintType.SPIRALS) {
@@ -47,7 +41,7 @@ function Canvas({width, height, baseContext}: ICanvas) {
           getSpiralsPaint({
             baseContext: baseContext,
             // paintContext: ctx.current!,
-            canvasElement: canvas.current!,
+            canvas: paintCanvas,
             resolution,
             screenRatio,
             width,
@@ -127,7 +121,7 @@ function Canvas({width, height, baseContext}: ICanvas) {
   }, [canvas, baseContext, canvas, resolution, screenRatio, width, height]);
 
   // return <canvas className={cx(styles.component)} width={width} height={height} ref={canvas} />;
-  return <div className={cx(styles.component)} ref={canvas} />;
+  return <div className={cx(styles.component)} ref={canvas} id="canvas" />;
 }
 
 export default Canvas;

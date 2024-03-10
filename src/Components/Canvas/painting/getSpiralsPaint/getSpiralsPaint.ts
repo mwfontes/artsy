@@ -5,10 +5,11 @@ import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getIsOutOfBounds} from '../../../../utils/getIsOutOfBounds';
 import {getIsFamilyOver} from '../../../../utils/getIsFamilyOver';
 import {EResolution} from '../../../../Providers/AppSettings/AppSettings';
+import {Vector} from 'two.js/src/vector';
 
 interface ISpiralPaint {
   baseContext: CanvasRenderingContext2D;
-  canvasElement: HTMLDivElement;
+  canvas: Two;
   width: number;
   height: number;
   screenRatio: number;
@@ -23,19 +24,30 @@ type TColor = {
   b: number;
 };
 
-const initialLineWidth = 20;
-// Block nodes are the squares that are drawn at the beginning of the spiral
-const maxBlockNodes = 10;
-const blockNodeInterval = 5;
-// number of steps before reading new color from base image
-const stepsPerColor = 128;
+const initialLineWidth = 500; // Half of full size;
+const stepSize: number = 16;
+const stepsPerColor = 32;
 const numberOfDescendants = 3;
 const numberOfPasses = 3;
 
 const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, step: number): TColor => {
   const {color} = node;
   if (step % stepsPerColor === 0) {
-    const newColor = getBasePixelData(node.x, node.y, baseContext);
+    let pixelX = node.x;
+    let pixelY = node.y;
+    if (pixelX > baseContext.canvas.width) {
+      pixelX = baseContext.canvas.width - 1;
+    }
+    if (pixelY > baseContext.canvas.height) {
+      pixelY = baseContext.canvas.height - 1;
+    }
+    if (pixelX < 0) {
+      pixelX = 0;
+    }
+    if (pixelY < 0) {
+      pixelY = 0;
+    }
+    const newColor = getBasePixelData(pixelX, pixelY, baseContext);
     return {
       r: newColor[0],
       g: newColor[1],
@@ -64,7 +76,7 @@ const getResolution = (resolution: EResolution) => {
 
 export const getSpiralsPaint = ({
   baseContext,
-  canvasElement,
+  canvas,
   width,
   height,
   screenRatio,
@@ -72,12 +84,9 @@ export const getSpiralsPaint = ({
   isDescendants,
   parentNode,
 }: ISpiralPaint) => {
-  if (!canvasElement) {
+  if (!canvas) {
     return;
   }
-
-  canvasElement.innerHTML = '';
-  var paintCanvas = new Two({width, height, type: Two.Types.svg}).appendTo(canvasElement);
 
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     // creates nodes based on resolution.
@@ -91,7 +100,6 @@ export const getSpiralsPaint = ({
       const {x, y, deg, spiralSize, directionMultiplierX, directionMultiplierY, lineWidth, color} = node;
       let currentSpiralSize = 0;
       let baseColor = getBaseColor(node, baseContext, currentSpiralSize);
-      const stepSize: number = 4;
       const descendantValues = {
         x,
         y,
@@ -99,10 +107,7 @@ export const getSpiralsPaint = ({
         spiralSize,
         color,
       };
-      // let currentPath = new Two.Path();
-      // currentPath.linewidth = 2;
-      // currentPath.noFill();
-      // currentPath.automatic = false;
+      let currentPathPoints = [];
 
       do {
         const spiralGrowingCurve = isDescendants ? 1 : currentSpiralSize / spiralSize;
@@ -120,34 +125,25 @@ export const getSpiralsPaint = ({
             spiralGrowingCurve *
             (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
             directionMultiplierY;
+        const isLastVertex = currentSpiralSize + stepSize >= spiralSize / currentPass;
 
         baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize);
 
         // draws the spiral from current node
-        paintCanvas.makeLine(descendantValues.x, descendantValues.y, newX, newY);
-        /*
-        paintCanvas.beginPath();
-        paintCanvas.moveTo(descendantValues.x, descendantValues.y); // starting point
-        paintCanvas.lineTo(newX, newY);
-        paintCanvas.strokeStyle = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
-        paintCanvas.lineWidth = lineWidth;
-        paintCanvas.lineCap = 'round';
-        paintCanvas.stroke();
-        */
-
-        // Initial blocks
-        /*
-        const correctedBlockNodeInterval = Math.floor((lineWidth / stepSize) * blockNodeInterval);
-        if (currentStep <= maxBlockNodes * correctedBlockNodeInterval && currentStep % correctedBlockNodeInterval === 0) {
-          paintContext.strokeStyle = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.25)`;
-          paintContext.fillStyle = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${
-            currentStep === 0 ? 0.8 : 0.5
-          })`;
-          paintContext.lineWidth = lineWidth / 4;
-          paintContext.fillRect(x - lineWidth * 2, y - lineWidth * 2, lineWidth * 4, lineWidth * 4);
-          paintContext.strokeRect(x - lineWidth * 2, y - lineWidth * 2, lineWidth * 4, lineWidth * 4);
+        if ((currentSpiralSize % stepsPerColor === 0 && currentSpiralSize > 0) || isLastVertex) {
+          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.curve));
+          var bezierPath = new Two.Path(currentPathPoints, false, true, false);
+          bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+          bezierPath.closed = false;
+          bezierPath.linewidth = lineWidth / getResolution(resolution) / currentPass;
+          bezierPath.cap = 'round';
+          bezierPath.noFill();
+          canvas.add(bezierPath);
+          currentPathPoints = [];
+          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.move));
+        } else {
+          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.curve));
         }
-        */
 
         // Update values
         descendantValues.x = newX;
@@ -163,7 +159,7 @@ export const getSpiralsPaint = ({
       if (!isDescendants) {
         getSpiralsPaint({
           baseContext,
-          canvasElement,
+          canvas,
           width,
           height,
           screenRatio,
@@ -174,5 +170,5 @@ export const getSpiralsPaint = ({
       }
     });
   }
-  paintCanvas.update();
+  canvas.update();
 };

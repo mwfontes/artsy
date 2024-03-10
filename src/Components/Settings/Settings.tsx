@@ -14,7 +14,6 @@ function Settings({onApply}: ISettings) {
   const familiesInputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const typeSelectRef = React.useRef<HTMLSelectElement>(null);
-  const renderSizeSelectRef = React.useRef<HTMLSelectElement>(null);
 
   const handleApply = () => {
     if (!fileInputRef.current!.files || fileInputRef.current!.files.length === 0) {
@@ -33,6 +32,25 @@ function Settings({onApply}: ISettings) {
     setPaintType(typeSelectRef.current!.value as EPaintType);
 
     onApply(imageUrl);
+  };
+
+  const handleDownload = () => {
+    const svg = document.getElementById('canvas')?.querySelector('svg') as SVGSVGElement | null;
+    if (!svg) {
+      console.error('No SVG found with id canvas');
+      return;
+    }
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], {type: 'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'artwork.svg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -66,6 +84,9 @@ function Settings({onApply}: ISettings) {
       </select>
       <button onClick={handleApply} className={cx(styles.applyButton)}>
         Apply
+      </button>
+      <button onClick={handleDownload} className={cx(styles.applyButton)}>
+        Download generated artwork
       </button>
     </div>
   );
