@@ -23,9 +23,7 @@ export interface ICanvas {
 
 function Canvas({width, height, baseContext}: ICanvas) {
   const {resolution, paintType} = useAppSettings();
-  // const canvas = createRef<HTMLCanvasElement>();
   const canvas = createRef<HTMLDivElement>();
-  // const ctx = useRef<CanvasRenderingContext2D>();
   const screenRatio = width / height;
 
   useEffect(() => {
@@ -37,10 +35,8 @@ function Canvas({width, height, baseContext}: ICanvas) {
 
       setTimeout(() => {
         if (paintType === EPaintType.SPIRALS) {
-          // ctx.current!.drawImage(baseContext.canvas, 0, 0, width, height);
           getSpiralsPaint({
             baseContext: baseContext,
-            // paintContext: ctx.current!,
             canvas: paintCanvas,
             resolution,
             screenRatio,
