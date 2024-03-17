@@ -12,6 +12,7 @@ import {getSlashLinesPaint} from './painting/getSlashLinesPaint/getSlashLinesPai
 import {EPaintType, useAppSettings} from '../../Providers/AppSettings/AppSettings';
 import {getTrianglesPaint} from './painting/getTrianglesPaint/getTrianglesPaint';
 import {getAverageColor} from '../../utils/getAverageColor';
+import {getHorizontalGradientLines} from './painting/getHorizontalGradientLines/getHorizontalGradientLines';
 
 import styles from './Canvas.styles';
 
@@ -37,13 +38,20 @@ function Canvas({width, height, baseContext}: ICanvas) {
 
       setTimeout(() => {
         if (paintType === EPaintType.SPIRALS) {
-          // ctx.current!.drawImage(baseContext.canvas, 0, 0, width, height);
           getSpiralsPaint({
             baseContext: baseContext,
-            // paintContext: ctx.current!,
             canvas: paintCanvas,
             resolution,
             screenRatio,
+            width,
+            height,
+          });
+        }
+        if (paintType === EPaintType.HORIZONTAL_GRADIENT_LINES) {
+          getHorizontalGradientLines({
+            baseContext: baseContext,
+            canvas: paintCanvas,
+            resolution,
             width,
             height,
           });
