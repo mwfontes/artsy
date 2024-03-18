@@ -59,18 +59,29 @@ export const getHorizontalGradientLines = ({
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     const numberOfRows = currentPass + 1;
     for (let currentRow = 0; currentRow < currentPass + 1; currentRow++) {
-      const y = (height / numberOfRows) * currentRow + height / numberOfRows / 2;
+      const y = Math.floor((height / numberOfRows) * currentRow + height / numberOfRows / 2);
       const numberOfLines = getResolution(resolution);
+      const numberOfWiggles = Math.floor(Math.random() * 6 + 4); // from 4 to 12
       for (let currentLine = 0; currentLine < numberOfLines; currentLine++) {
-        const rotationAngle = (Math.PI / numberOfLines) * currentLine * 3; // PAREI AQUI
-        const regtangleWidth = width / numberOfLines;
-        const rectangleHeight = height / numberOfRows;
-        const x = (width / numberOfLines) * currentLine + regtangleWidth / 2;
-        const baseColor = getBaseColor(x, y, baseContext);
-        const rectangle = new Two.RoundedRectangle(x, y, regtangleWidth, rectangleHeight, regtangleWidth / 2);
-        rectangle.rotation = Math.sin(rotationAngle);
-        rectangle.fill = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+        const rotationAngle = (Math.PI / 8) * Math.cos((Math.PI / numberOfLines) * numberOfWiggles * currentLine);
+        const rectangleWidth = (width / numberOfLines) * 1;
+        const rectangleHeight =
+          (height / numberOfRows) * (Math.abs(Math.sin((currentLine * numberOfWiggles) / numberOfLines)) * 0.6 + 0.4);
+        const x = Math.floor((width / numberOfLines) * currentLine + rectangleWidth / 2);
+        const colors = [
+          getBaseColor(x, y - rectangleHeight / 2, baseContext),
+          getBaseColor(x, y + rectangleHeight / 2, baseContext),
+        ];
+        const gradient = new Two.LinearGradient(0.5, 0, 0.5, 1, [
+          new Two.Stop(0, `rgb(${colors[0].r}, ${colors[0].g}, ${colors[0].b})`),
+          new Two.Stop(1, `rgb(${colors[1].r}, ${colors[1].g}, ${colors[1].b})`),
+        ]);
+        gradient.units = 'objectBoundingBox';
+        const rectangle = new Two.RoundedRectangle(x, y, rectangleWidth, rectangleHeight, rectangleWidth / 2);
         rectangle.noStroke();
+        rectangle.fill = gradient;
+        rectangle.opacity = 1 / numberOfPasses;
+        rectangle.rotation = rotationAngle;
         canvas.add(rectangle);
       }
     }
