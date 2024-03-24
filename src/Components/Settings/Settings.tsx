@@ -56,7 +56,7 @@ function Settings({onApply}: ISettings) {
   return (
     <div className={cx(styles.component)}>
       <h1>Settings</h1>
-      <h3>Image file in A4 aspect ratio</h3>
+      <h3>Image file</h3>
       <input ref={fileInputRef} type="file" className={cx(styles.input)} />
       <section>
         <h3>Artwork resolution</h3>

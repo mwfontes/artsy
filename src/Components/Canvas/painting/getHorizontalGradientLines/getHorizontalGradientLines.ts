@@ -54,7 +54,7 @@ export const getHorizontalGradientLines = ({
     return;
   }
 
-  const numberOfPasses = 1;
+  const numberOfPasses = 4;
 
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     const numberOfRows = currentPass + 1;
