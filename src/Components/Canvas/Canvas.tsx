@@ -3,6 +3,7 @@ import {cx} from '@emotion/css';
 import Two from 'two.js';
 
 import {getSpiralsPaint} from './painting/getSpiralsPaint/getSpiralsPaint';
+import {getSquaredomPaint} from './painting/getSquaredomPaint';
 import {getGradientLinesPaint} from './painting/getGradientLinesPaint/getGradientLinesPaint';
 import {getHorizontalLinesPaint} from './painting/getHorizontalLinesPaint/getHorizontalLinesPaint';
 import {getVerticalLinesPaint} from './painting/getVerticalLinesPaint/getVerticalLinesPaint';
@@ -47,8 +48,8 @@ function Canvas({width, height, baseContext}: ICanvas) {
             height,
           });
         }
-        if (paintType === EPaintType.HORIZONTAL_GRADIENT_LINES) {
-          getHorizontalGradientLines({
+        if (paintType === EPaintType.SQUAREDOM) {
+          getSquaredomPaint({
             baseContext: baseContext,
             canvas: paintCanvas,
             resolution,
@@ -56,6 +57,15 @@ function Canvas({width, height, baseContext}: ICanvas) {
             height,
           });
         }
+        // if (paintType === EPaintType.HORIZONTAL_GRADIENT_LINES) {
+        //   getHorizontalGradientLines({
+        //     baseContext: baseContext,
+        //     canvas: paintCanvas,
+        //     resolution,
+        //     width,
+        //     height,
+        //   });
+        // }
         // if (paintType === EPaintType.GRADIENT_LINES) {
         //   getGradientLinesPaint({
         //     baseContext: baseContext!,

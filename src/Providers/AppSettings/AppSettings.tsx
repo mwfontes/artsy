@@ -2,6 +2,7 @@ import {createContext, useEffect, useState, useContext} from 'react';
 
 export enum EPaintType {
   SPIRALS = 'Spirals',
+  SQUAREDOM = 'Squaredom',
   HORIZONTAL_GRADIENT_LINES = 'Horizontal gradient lines',
   GRADIENT_LINES = 'Gradient lines',
   HORIZONTAL_LINES = 'Horizontal lines',
