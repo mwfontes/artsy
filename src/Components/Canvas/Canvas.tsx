@@ -3,7 +3,7 @@ import {cx} from '@emotion/css';
 import Two from 'two.js';
 
 import {getSpiralsPaint} from './painting/getSpiralsPaint/getSpiralsPaint';
-import {getSquaredomPaint} from './painting/getSquaredomPaint';
+import {getCircledomPaint} from './painting/getCircledomPaint';
 import {getGradientLinesPaint} from './painting/getGradientLinesPaint/getGradientLinesPaint';
 import {getHorizontalLinesPaint} from './painting/getHorizontalLinesPaint/getHorizontalLinesPaint';
 import {getVerticalLinesPaint} from './painting/getVerticalLinesPaint/getVerticalLinesPaint';
@@ -48,8 +48,8 @@ function Canvas({width, height, baseContext}: ICanvas) {
             height,
           });
         }
-        if (paintType === EPaintType.SQUAREDOM) {
-          getSquaredomPaint({
+        if (paintType === EPaintType.CIRCLEDOM) {
+          getCircledomPaint({
             baseContext: baseContext,
             canvas: paintCanvas,
             resolution,
