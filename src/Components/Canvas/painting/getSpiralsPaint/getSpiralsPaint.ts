@@ -132,7 +132,7 @@ export const getSpiralsPaint = ({
         // draws the spiral from current node
         if ((currentSpiralSize % stepsPerColor === 0 && currentSpiralSize > 0) || isLastVertex) {
           currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.curve));
-          var bezierPath = new Two.Path(currentPathPoints, false, true, false);
+          const bezierPath = new Two.Path(currentPathPoints, false, true, false);
           bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
           bezierPath.closed = false;
           bezierPath.linewidth = lineWidth / getResolution(resolution) / currentPass;

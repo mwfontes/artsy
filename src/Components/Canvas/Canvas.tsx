@@ -3,6 +3,7 @@ import {cx} from '@emotion/css';
 import Two from 'two.js';
 
 import {getSpiralsPaint} from './painting/getSpiralsPaint/getSpiralsPaint';
+import {getCircledomPaint} from './painting/getCircledomPaint';
 import {getGradientLinesPaint} from './painting/getGradientLinesPaint/getGradientLinesPaint';
 import {getHorizontalLinesPaint} from './painting/getHorizontalLinesPaint/getHorizontalLinesPaint';
 import {getVerticalLinesPaint} from './painting/getVerticalLinesPaint/getVerticalLinesPaint';
@@ -12,6 +13,7 @@ import {getSlashLinesPaint} from './painting/getSlashLinesPaint/getSlashLinesPai
 import {EPaintType, useAppSettings} from '../../Providers/AppSettings/AppSettings';
 import {getTrianglesPaint} from './painting/getTrianglesPaint/getTrianglesPaint';
 import {getAverageColor} from '../../utils/getAverageColor';
+import {getHorizontalGradientLines} from './painting/getHorizontalGradientLines/getHorizontalGradientLines';
 
 import styles from './Canvas.styles';
 
@@ -44,6 +46,24 @@ function Canvas({width, height, baseContext}: ICanvas) {
             height,
           });
         }
+        if (paintType === EPaintType.CIRCLEDOM) {
+          getCircledomPaint({
+            baseContext: baseContext,
+            canvas: paintCanvas,
+            resolution,
+            width,
+            height,
+          });
+        }
+        // if (paintType === EPaintType.HORIZONTAL_GRADIENT_LINES) {
+        //   getHorizontalGradientLines({
+        //     baseContext: baseContext,
+        //     canvas: paintCanvas,
+        //     resolution,
+        //     width,
+        //     height,
+        //   });
+        // }
         // if (paintType === EPaintType.GRADIENT_LINES) {
         //   getGradientLinesPaint({
         //     baseContext: baseContext!,
