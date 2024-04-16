@@ -51,7 +51,11 @@ function App() {
 
   return (
     <SettingsContext.Provider value={{resolution, paintType, setResolution, setPaintType}}>
-      <div className={cx(styles.component(baseCanvasRef.current!.width > baseCanvasRef.current!.height))}>
+      <div
+        className={cx(
+          styles.component(baseCanvasRef.current ? baseCanvasRef.current!.width > baseCanvasRef.current!.height : false)
+        )}
+      >
         <Settings onApply={updateOrLoadImage} />
         {isImageLoaded && (
           <Canvas

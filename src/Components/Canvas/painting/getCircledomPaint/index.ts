@@ -60,14 +60,16 @@ export const getCircledomPaint = ({baseContext, canvas, width, height, resolutio
   const mainCircles = [];
   const largeCircles = [];
 
-  const addCircle = ({x, y, size, gradient, lineWidth}: TCircle) => {
+  const addShape = ({x, y, size, gradient, lineWidth}: TCircle) => {
     const topXPos = Math.random() > 0.5 ? 0 : 1;
     const bottomXPos = Math.random() > 0.5 ? 0 : 1;
-    const colorTop = topXPos === 0 ? getBaseColor(x, y, baseContext) : getBaseColor(x + squareSize, y, baseContext);
+    const isFilled = Math.random() > 0.5;
+    const isCircle = Math.random() > 0.5;
+    const colorTop = topXPos === 0 ? getBaseColor(x, y, baseContext) : getBaseColor(x + shapeSize, y, baseContext);
     const colorBottom =
       bottomXPos === 0
-        ? getBaseColor(x, y + squareSize, baseContext)
-        : getBaseColor(x + squareSize, y + squareSize, baseContext);
+        ? getBaseColor(x, y + shapeSize, baseContext)
+        : getBaseColor(x + shapeSize, y + shapeSize, baseContext);
     const localGradient =
       gradient ||
       new Two.LinearGradient(topXPos, 0, bottomXPos, 1, [
@@ -75,48 +77,38 @@ export const getCircledomPaint = ({baseContext, canvas, width, height, resolutio
         new Two.Stop(1, `rgb(${colorBottom.r}, ${colorBottom.g}, ${colorBottom.b})`),
       ]);
 
-    const circle = canvas.makeCircle(x, y, size);
-    circle.noFill();
-    circle.stroke = localGradient;
-    circle.linewidth = lineWidth || 2;
+    const shape = isCircle ? canvas.makeCircle(x, y, size) : canvas.makeRectangle(x, y, size * 2, size * 2);
+    shape.linewidth = lineWidth || 2;
+    if (isFilled) {
+      shape.fill = localGradient;
+      shape.noStroke();
+    } else {
+      shape.noFill();
+      shape.stroke = localGradient;
+    }
 
-    return circle;
+    return shape;
   };
 
   // draws main circles
-  const squareSize = width / getResolution(resolution);
-  for (let ix = 0; ix < width / squareSize; ix++) {
-    for (let iy = 0; iy < height / (squareSize * 0.85); iy++) {
+  const shapeSize = width / getResolution(resolution);
+  for (let ix = 0; ix < width / shapeSize; ix++) {
+    for (let iy = 0; iy < height / (shapeSize * 0.85); iy++) {
       const isEvenRow = iy % 2 === 0;
 
       if ((ix > 0 && !isEvenRow) || isEvenRow) {
-        const x = ix * squareSize;
-        const y = iy * (squareSize * 0.85);
+        const x = ix * shapeSize;
+        const y = iy * (shapeSize * 0.85);
 
-        const sizeVariation = (squareSize / 3) * Math.random();
+        const sizeVariation = (shapeSize / 3) * Math.random();
 
-        const circle = isEvenRow
-          ? addCircle({x: x + squareSize / 2, y: y + squareSize / 2, size: squareSize / 2 - sizeVariation})
-          : addCircle({x, y: y + squareSize / 2, size: squareSize / 2 - sizeVariation});
+        const shape = isEvenRow
+          ? addShape({x: x + shapeSize / 2, y: y + shapeSize / 2, size: shapeSize / 2 - sizeVariation})
+          : addShape({x, y: y + shapeSize / 2, size: shapeSize / 2 - sizeVariation});
 
-        mainCircles.push(circle);
+        mainCircles.push(shape);
       }
     }
-  }
-
-  // draws large circles
-  const numberOfLargeCircles = 16;
-  for (let i = 0; i < numberOfLargeCircles; i++) {
-    const referenceCircle = mainCircles[Math.floor(Math.random() * mainCircles.length)];
-    const largeSize = referenceCircle.radius * width > height ? height / 10 : width / 10;
-    const largeCircle = addCircle({
-      x: referenceCircle.translation.x,
-      y: referenceCircle.translation.y,
-      size: largeSize,
-      gradient: referenceCircle.stroke as LinearGradient,
-      lineWidth: 4,
-    });
-    largeCircles.push(largeCircle);
   }
   canvas.update();
 };

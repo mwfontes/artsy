@@ -1,4 +1,4 @@
-(): string => import {css} from '@emotion/css';
+import {css} from '@emotion/css';
 
 export default {
   component: (isHorizontalLayout = true): string => css`
@@ -9,7 +9,8 @@ export default {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    ${isHorizontalLayout && css`
+    ${isHorizontalLayout &&
+    css`
       flex-direction: row;
     `}
   `,
