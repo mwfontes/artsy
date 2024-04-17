@@ -27,8 +27,8 @@ export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineW
   const startingX = Math.floor(Math.random() * width);
   const startingY = Math.floor(Math.random() * height);
   const startingDeg = Math.random() * 2 * Math.PI;
-  const minimumSpiralSize = width > height ? width / 8 : height / 8;
-  const spiralSize = (width > height ? width / 4 : height / 4) - minimumSpiralSize;
+  const minimumSpiralSize = width > height ? width / 4 : height / 4;
+  const spiralSize = (width > height ? width / 2 : height / 2) - minimumSpiralSize;
 
   const imagePixelColor = getBasePixelData(parentNode?.x || startingX, parentNode?.y || startingY, baseContext);
 

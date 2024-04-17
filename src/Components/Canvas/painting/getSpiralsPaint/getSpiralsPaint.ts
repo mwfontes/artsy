@@ -24,13 +24,12 @@ type TColor = {
   b: number;
 };
 
-const initialLineWidth = 500; // Half of full size;
-const stepSize: number = 16;
-const stepsPerColor = 32;
-const numberOfDescendants = 3;
-const numberOfPasses = 3;
-
-const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, step: number): TColor => {
+const getBaseColor = (
+  node: TSpiralNode,
+  baseContext: CanvasRenderingContext2D,
+  step: number,
+  stepsPerColor: number
+): TColor => {
   const {color} = node;
   if (step % stepsPerColor === 0) {
     let pixelX = node.x;
@@ -60,17 +59,17 @@ const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, 
 const getResolution = (resolution: EResolution) => {
   switch (resolution) {
     case EResolution.VERY_LOW:
-      return 16;
+      return 2;
     case EResolution.LOW:
-      return 32;
+      return 3;
     case EResolution.MEDIUM:
-      return 64;
+      return 4;
     case EResolution.HIGH:
-      return 128;
+      return 5;
     case EResolution.VERY_HIGH:
-      return 256;
+      return 6;
     default:
-      return 64;
+      return 4;
   }
 };
 
@@ -88,10 +87,17 @@ export const getSpiralsPaint = ({
     return;
   }
 
+  const initialLineWidth = 50; // Half of full size;
+  const stepSize: number = 16;
+  const stepsPerColor = 16;
+  const numberOfDescendants = 3;
+  const numberOfPasses = getResolution(resolution);
+
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
+    const numberOfMainSpirals = numberOfPasses * numberOfPasses;
     // creates nodes based on resolution.
     // 1 resultion point = 1 new node (spiral line)
-    const nodes = [...new Array(isDescendants ? numberOfDescendants : getResolution(resolution))].map((_newItem) =>
+    const nodes = [...new Array(isDescendants ? numberOfDescendants : numberOfMainSpirals)].map((_newItem) =>
       getNewSpiralsNode({baseContext, width, height, lineWidth: initialLineWidth, parentNode})
     );
 
@@ -99,7 +105,7 @@ export const getSpiralsPaint = ({
     nodes.forEach((node, i) => {
       const {x, y, deg, spiralSize, directionMultiplierX, directionMultiplierY, lineWidth, color} = node;
       let currentSpiralSize = 0;
-      let baseColor = getBaseColor(node, baseContext, currentSpiralSize);
+      let baseColor = getBaseColor(node, baseContext, currentSpiralSize, stepsPerColor);
       const descendantValues = {
         x,
         y,
@@ -127,16 +133,18 @@ export const getSpiralsPaint = ({
             directionMultiplierY;
         const isLastVertex = currentSpiralSize + stepSize >= spiralSize / currentPass;
 
-        baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize);
+        baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize, stepsPerColor);
 
         // draws the spiral from current node
         if ((currentSpiralSize % stepsPerColor === 0 && currentSpiralSize > 0) || isLastVertex) {
-          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.curve));
+          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0));
           const bezierPath = new Two.Path(currentPathPoints, false, true, false);
-          bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`;
+          bezierPath.stroke = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${
+            (getResolution(resolution) / getResolution(EResolution.VERY_HIGH)) * 0.9
+          })`;
           bezierPath.closed = false;
-          bezierPath.linewidth = lineWidth / getResolution(resolution) / currentPass;
-          bezierPath.cap = 'round';
+          bezierPath.linewidth = lineWidth / currentPass;
+          bezierPath.cap = 'miter';
           bezierPath.noFill();
           canvas.add(bezierPath);
           currentPathPoints = [];
@@ -153,7 +161,7 @@ export const getSpiralsPaint = ({
         descendantValues.color = baseColor;
 
         currentSpiralSize += stepSize;
-      } while (currentSpiralSize < spiralSize / currentPass);
+      } while (currentSpiralSize < spiralSize / (currentPass * 0.5));
 
       // fires painting of descendants if ends painting parent
       if (!isDescendants) {
