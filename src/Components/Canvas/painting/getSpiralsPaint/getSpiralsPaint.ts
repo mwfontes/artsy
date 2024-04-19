@@ -57,7 +57,7 @@ const getBaseColor = (
 const getResolution = (resolution: EResolution) => {
   switch (resolution) {
     case EResolution.VERY_LOW:
-      return 1;
+      return 2;
     case EResolution.LOW:
       return 3;
     case EResolution.MEDIUM:
@@ -90,7 +90,7 @@ export const getSpiralsPaint = ({
   const stepsPerColor = 16;
   const numberOfDescendants = 3;
   const numberOfPasses = getResolution(resolution);
-  const fineTuneCurve = 1;
+  const fineTuneCurve = 4;
 
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     const numberOfMainSpirals = numberOfPasses * numberOfPasses;
@@ -119,36 +119,30 @@ export const getSpiralsPaint = ({
         const spiralGrowingCurve = isDescendants ? 1 : currentSpiralSize / spiralSize;
         const numberOfRevolutions = isDescendants ? 0.5 : 4;
 
-        if (currentSpiralSize * spiralGrowingCurve < shapeWidth) {
+        if (currentSpiralSize * spiralGrowingCurve < shapeWidth && !isDescendants) {
           currentSpiralSize += stepSize / fineTuneCurve;
         } else {
-          const newDeg = deg + currentSpiralSize * ((Math.PI * 2 * numberOfRevolutions) / spiralSize);
+          const addToDeg = currentSpiralSize * ((Math.PI * 2 * numberOfRevolutions) / spiralSize);
+          const newDeg = deg + addToDeg;
+          const currentRadius = currentSpiralSize * spiralGrowingCurve;
           const newXa =
             x + // current position
-            (currentSpiralSize * // radius
-              spiralGrowingCurve +
-              shapeWidth / 2) * // makes it expand as it grows
+            (currentRadius + shapeWidth / 2) *
               (isDescendants ? Math.sin(newDeg) : Math.cos(newDeg)) *
               directionMultiplierX; // clockwise or counter-clockwise
           const newYa =
             y +
-            (currentSpiralSize * // radius
-              spiralGrowingCurve +
-              shapeWidth / 2) * // makes it expand as it grows
+            (currentRadius + shapeWidth / 2) *
               (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
               directionMultiplierY;
           const newXb =
             x + // current position
-            (currentSpiralSize * // radius
-              spiralGrowingCurve -
-              shapeWidth / 2) * // makes it expand as it grows
+            (currentRadius - shapeWidth / 2) *
               (isDescendants ? Math.sin(newDeg) : Math.cos(newDeg)) *
               directionMultiplierX; // clockwise or counter-clockwise
           const newYb =
             y +
-            (currentSpiralSize * // radius
-              spiralGrowingCurve -
-              shapeWidth / 2) * // makes it expand as it grows
+            (currentRadius - shapeWidth / 2) *
               (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
               directionMultiplierY;
 
@@ -176,8 +170,8 @@ export const getSpiralsPaint = ({
           currentPathPoints.push(new Two.Anchor(newXb, newYb, 0, 0, 0, 0, Two.Commands.line));
 
           // Update values
-          descendantValues.x = newXa;
-          descendantValues.y = newYa;
+          descendantValues.x = (newXa + newXb) / 2;
+          descendantValues.y = (newYa + newYb) / 2;
           descendantValues.lineWidth = lineWidth / currentPass;
           descendantValues.spiralSize = spiralSize / currentPass;
           descendantValues.color = baseColor;
@@ -187,18 +181,18 @@ export const getSpiralsPaint = ({
       } while (currentSpiralSize < spiralSize / (currentPass * 0.5));
 
       // fires painting of descendants if ends painting parent
-      if (!isDescendants) {
-        getSpiralsPaint({
-          baseContext,
-          canvas,
-          width,
-          height,
-          screenRatio,
-          resolution,
-          isDescendants: true,
-          parentNode: {...node, ...descendantValues},
-        });
-      }
+      // if (!isDescendants) {
+      //   getSpiralsPaint({
+      //     baseContext,
+      //     canvas,
+      //     width,
+      //     height,
+      //     screenRatio,
+      //     resolution,
+      //     isDescendants: true,
+      //     parentNode: {...node, ...descendantValues},
+      //   });
+      // }
     });
   }
   canvas.update();
