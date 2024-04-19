@@ -57,7 +57,7 @@ const getBaseColor = (
 const getResolution = (resolution: EResolution) => {
   switch (resolution) {
     case EResolution.VERY_LOW:
-      return 2;
+      return 1;
     case EResolution.LOW:
       return 3;
     case EResolution.MEDIUM:
@@ -69,10 +69,6 @@ const getResolution = (resolution: EResolution) => {
     default:
       return 4;
   }
-};
-
-const getVariation = (spiralSize: number, currentSpiralSize: number) => {
-  // Here goes logic
 };
 
 export const getSpiralsPaint = ({
@@ -89,11 +85,12 @@ export const getSpiralsPaint = ({
     return;
   }
 
-  const initialLineWidth = 50; // Half of full size;
+  const initialLineWidth = 100; // Half of full size;
   const stepSize: number = 16;
   const stepsPerColor = 16;
   const numberOfDescendants = 3;
   const numberOfPasses = getResolution(resolution);
+  const fineTuneCurve = 1;
 
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
     const numberOfMainSpirals = numberOfPasses * numberOfPasses;
@@ -108,6 +105,7 @@ export const getSpiralsPaint = ({
       const {x, y, deg, spiralSize, directionMultiplierX, directionMultiplierY, lineWidth, color} = node;
       let currentSpiralSize = 0;
       let baseColor = getBaseColor(node, baseContext, currentSpiralSize, stepsPerColor);
+      const shapeWidth = lineWidth / currentPass;
       const descendantValues = {
         x,
         y,
@@ -120,53 +118,72 @@ export const getSpiralsPaint = ({
       do {
         const spiralGrowingCurve = isDescendants ? 1 : currentSpiralSize / spiralSize;
         const numberOfRevolutions = isDescendants ? 0.5 : 4;
-        const newDeg = deg + currentSpiralSize * ((Math.PI * 2 * numberOfRevolutions) / spiralSize);
-        const newX =
-          x +
-          (20 - Math.random() * 40) +
-          currentSpiralSize *
-            spiralGrowingCurve *
-            (isDescendants ? Math.sin(newDeg) : Math.cos(newDeg)) *
-            directionMultiplierX;
-        const newY =
-          y +
-          (20 - Math.random() * 20) +
-          currentSpiralSize *
-            spiralGrowingCurve *
-            (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
-            directionMultiplierY;
-        const isLastVertex = currentSpiralSize + stepSize >= spiralSize / currentPass;
 
-        baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize, stepsPerColor);
+        if (currentSpiralSize * spiralGrowingCurve < shapeWidth) {
+          currentSpiralSize += stepSize / fineTuneCurve;
+        } else {
+          const newDeg = deg + currentSpiralSize * ((Math.PI * 2 * numberOfRevolutions) / spiralSize);
+          const newXa =
+            x + // current position
+            (currentSpiralSize * // radius
+              spiralGrowingCurve +
+              shapeWidth / 2) * // makes it expand as it grows
+              (isDescendants ? Math.sin(newDeg) : Math.cos(newDeg)) *
+              directionMultiplierX; // clockwise or counter-clockwise
+          const newYa =
+            y +
+            (currentSpiralSize * // radius
+              spiralGrowingCurve +
+              shapeWidth / 2) * // makes it expand as it grows
+              (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
+              directionMultiplierY;
+          const newXb =
+            x + // current position
+            (currentSpiralSize * // radius
+              spiralGrowingCurve -
+              shapeWidth / 2) * // makes it expand as it grows
+              (isDescendants ? Math.sin(newDeg) : Math.cos(newDeg)) *
+              directionMultiplierX; // clockwise or counter-clockwise
+          const newYb =
+            y +
+            (currentSpiralSize * // radius
+              spiralGrowingCurve -
+              shapeWidth / 2) * // makes it expand as it grows
+              (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
+              directionMultiplierY;
 
-        if (getIsOutOfBounds({node, width, height})) {
-          return;
-        }
+          const isLastVertex = currentSpiralSize + stepSize >= spiralSize / currentPass;
 
-        // draws the spiral from current node
-        if ((currentSpiralSize % stepsPerColor === 0 && currentSpiralSize > 0) || isLastVertex) {
-          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0));
-          const bezierPath = new Two.Path(currentPathPoints, false, true, false);
-          bezierPath.stroke = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.7)`;
+          baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize, stepsPerColor);
+
+          if (getIsOutOfBounds({node, width, height})) {
+            return;
+          }
+
+          // draws the spiral from current node
+          currentPathPoints.push(new Two.Anchor(newXb, newYb, 0, 0, 0, 0, Two.Commands.line));
+          currentPathPoints.push(new Two.Anchor(newXa, newYa, 0, 0, 0, 0, Two.Commands.line));
+          console.log('last one and restart', currentPathPoints);
+          const bezierPath = new Two.Path(currentPathPoints, false, false, false);
+          bezierPath.fill = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 1)`;
           bezierPath.closed = false;
           bezierPath.linewidth = lineWidth / currentPass;
           bezierPath.cap = 'miter';
-          bezierPath.noFill();
+          bezierPath.noStroke();
           canvas.add(bezierPath);
           currentPathPoints = [];
-          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.move));
-        } else {
-          currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.curve));
+          currentPathPoints.push(new Two.Anchor(newXa, newYa, 0, 0, 0, 0, Two.Commands.line));
+          currentPathPoints.push(new Two.Anchor(newXb, newYb, 0, 0, 0, 0, Two.Commands.line));
+
+          // Update values
+          descendantValues.x = newXa;
+          descendantValues.y = newYa;
+          descendantValues.lineWidth = lineWidth / currentPass;
+          descendantValues.spiralSize = spiralSize / currentPass;
+          descendantValues.color = baseColor;
+
+          currentSpiralSize += stepSize / fineTuneCurve;
         }
-
-        // Update values
-        descendantValues.x = newX;
-        descendantValues.y = newY;
-        descendantValues.lineWidth = lineWidth / 2;
-        descendantValues.spiralSize = spiralSize / currentPass;
-        descendantValues.color = baseColor;
-
-        currentSpiralSize += stepSize;
       } while (currentSpiralSize < spiralSize / (currentPass * 0.5));
 
       // fires painting of descendants if ends painting parent
