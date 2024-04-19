@@ -1,7 +1,7 @@
 import React from 'react';
 import {cx} from '@emotion/css';
 
-import {EPaintType, useAppSettings, EResolution} from '../../Providers/AppSettings/AppSettings';
+import {useAppSettings, EResolution} from '../../Providers/AppSettings/AppSettings';
 
 import styles from './Settings.styles';
 
@@ -10,7 +10,7 @@ interface ISettings {
 }
 
 function Settings({onApply}: ISettings) {
-  const {setResolution, setPaintType, resolution} = useAppSettings();
+  const {setResolution} = useAppSettings();
   const familiesInputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const typeSelectRef = React.useRef<HTMLSelectElement>(null);
@@ -29,7 +29,6 @@ function Settings({onApply}: ISettings) {
     if (resolutionRadioEls.length) {
       setResolution([...resolutionRadioEls].find((radio) => radio.checked)!.value as EResolution);
     }
-    setPaintType(typeSelectRef.current!.value as EPaintType);
 
     onApply(imageUrl);
   };
@@ -74,18 +73,10 @@ function Settings({onApply}: ISettings) {
           ))}
         </div>
       </section>
-      <h3>Paint mode</h3>
-      <select ref={typeSelectRef} className={cx(styles.input)}>
-        {Object.values(EPaintType).map((type: EPaintType) => (
-          <option value={type} key={type}>
-            {type}
-          </option>
-        ))}
-      </select>
-      <button onClick={handleApply} className={cx(styles.applyButton)}>
+      <button onClick={handleApply} className={cx(styles.actionButtons)}>
         Apply
       </button>
-      <button onClick={handleDownload} className={cx(styles.applyButton)}>
+      <button onClick={handleDownload} className={cx(styles.actionButtons)}>
         Download generated artwork
       </button>
     </div>

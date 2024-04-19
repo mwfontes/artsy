@@ -3,9 +3,7 @@ import Two from 'two.js';
 import {getNewSpiralsNode, TSpiralNode} from './getNewSpiralsNode';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 import {getIsOutOfBounds} from '../../../../utils/getIsOutOfBounds';
-import {getIsFamilyOver} from '../../../../utils/getIsFamilyOver';
 import {EResolution} from '../../../../Providers/AppSettings/AppSettings';
-import {Vector} from 'two.js/src/vector';
 
 interface ISpiralPaint {
   baseContext: CanvasRenderingContext2D;
@@ -73,6 +71,10 @@ const getResolution = (resolution: EResolution) => {
   }
 };
 
+const getVariation = (spiralSize: number, currentSpiralSize: number) => {
+  // Here goes logic
+};
+
 export const getSpiralsPaint = ({
   baseContext,
   canvas,
@@ -121,12 +123,14 @@ export const getSpiralsPaint = ({
         const newDeg = deg + currentSpiralSize * ((Math.PI * 2 * numberOfRevolutions) / spiralSize);
         const newX =
           x +
+          (20 - Math.random() * 40) +
           currentSpiralSize *
             spiralGrowingCurve *
             (isDescendants ? Math.sin(newDeg) : Math.cos(newDeg)) *
             directionMultiplierX;
         const newY =
           y +
+          (20 - Math.random() * 20) +
           currentSpiralSize *
             spiralGrowingCurve *
             (isDescendants ? Math.cos(newDeg) : Math.sin(newDeg)) *
@@ -135,13 +139,15 @@ export const getSpiralsPaint = ({
 
         baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize, stepsPerColor);
 
+        if (getIsOutOfBounds({node, width, height})) {
+          return;
+        }
+
         // draws the spiral from current node
         if ((currentSpiralSize % stepsPerColor === 0 && currentSpiralSize > 0) || isLastVertex) {
           currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0));
           const bezierPath = new Two.Path(currentPathPoints, false, true, false);
-          bezierPath.stroke = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, ${
-            (getResolution(resolution) / getResolution(EResolution.VERY_HIGH)) * 0.9
-          })`;
+          bezierPath.stroke = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.7)`;
           bezierPath.closed = false;
           bezierPath.linewidth = lineWidth / currentPass;
           bezierPath.cap = 'miter';

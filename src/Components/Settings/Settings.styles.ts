@@ -15,6 +15,7 @@ export default {
     label: settings_resolutionSelection;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    margin-bottom: 20px;
     & > div {
       display: flex;
       flex-direction: column;
@@ -33,12 +34,16 @@ export default {
       }
     }
   `,
-  applyButton: css`
+  actionButtons: css`
     label: settings_applyButton;
     background-color: white;
+    height: 50px;
     &:active {
       background-color: black;
       color: white;
+    }
+    &:not(:last-child) {
+      margin-bottom: 20px;
     }
   `,
 };

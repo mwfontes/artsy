@@ -13,7 +13,7 @@ function App() {
   const baseCanvasRef = useRef<HTMLCanvasElement>();
   const baseContextRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  const {resolution, paintType, setResolution, setPaintType} = appSettings();
+  const {resolution, setResolution} = appSettings();
 
   const updateOrLoadImage = (imageUrl: string) => {
     if (!imageUrl) {
@@ -50,7 +50,7 @@ function App() {
   };
 
   return (
-    <SettingsContext.Provider value={{resolution, paintType, setResolution, setPaintType}}>
+    <SettingsContext.Provider value={{resolution, setResolution}}>
       <div
         className={cx(
           styles.component(baseCanvasRef.current ? baseCanvasRef.current!.width > baseCanvasRef.current!.height : false)

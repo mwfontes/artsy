@@ -1,8 +1,7 @@
 import {TSpiralNode} from '../Components/Canvas/painting/getSpiralsPaint/getNewSpiralsNode';
-import {TLineNode} from '../Components/Canvas/painting/getGradientLinesPaint/getNewGradientLinesNode';
 
 interface IGetIsOutOfBounds {
-  node: TSpiralNode | TLineNode;
+  node: TSpiralNode;
   width: number;
   height: number;
 }
