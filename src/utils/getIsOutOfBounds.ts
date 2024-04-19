@@ -1,23 +1,22 @@
-import {TSpiralNode} from '../Components/Canvas/painting/getSpiralsPaint/getNewSpiralsNode';
-
 interface IGetIsOutOfBounds {
-  node: TSpiralNode;
+  x: number;
+  y: number;
   width: number;
   height: number;
 }
 
-export const getIsOutOfBounds = ({node, width, height}: IGetIsOutOfBounds): boolean => {
-  // Out of bounds
-  if (node.x > width) {
+export const getIsOutOfBounds = ({x, y, width, height}: IGetIsOutOfBounds): boolean => {
+  // Out of bounds - should die
+  if (x > width) {
     return true;
   }
-  if (node.x < 0) {
+  if (x < 0) {
     return true;
   }
-  if (node.y > height) {
+  if (y > height) {
     return true;
   }
-  if (node.y < 0) {
+  if (y < 0) {
     return true;
   }
 

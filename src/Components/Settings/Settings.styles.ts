@@ -26,10 +26,13 @@ export default {
       & > label {
         padding: 10px;
         border: 1px solid black;
+        border-radius: 20px;
+        transition: border-radius 200ms;
         cursor: pointer;
       }
       & > input:checked + label {
         background-color: black;
+        border-radius: 0;
         color: white;
       }
     }
@@ -37,7 +40,8 @@ export default {
   actionButtons: css`
     label: settings_applyButton;
     background-color: white;
-    height: 50px;
+    padding: 10px;
+    border-radius: 20px;
     &:active {
       background-color: black;
       color: white;
