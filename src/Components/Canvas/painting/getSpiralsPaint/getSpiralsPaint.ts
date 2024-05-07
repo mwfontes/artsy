@@ -141,10 +141,10 @@ export const getSpiralsPaint = ({
         if ((currentSpiralSize % stepsPerColor === 0 && currentSpiralSize > 0) || isLastVertex) {
           currentPathPoints.push(new Two.Anchor(newX, newY, 0, 0, 0, 0, Two.Commands.line));
           const bezierPath = new Two.Path(currentPathPoints, false, false, false);
-          bezierPath.stroke = `rgba(${baseColor.r}, ${baseColor.g}, ${baseColor.b}, 0.5)`;
+          bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
           bezierPath.closed = false;
           bezierPath.linewidth = lineWidth / (currentPass * 2);
-          bezierPath.cap = 'miter';
+          bezierPath.cap = 'round';
           bezierPath.noFill();
           canvas.add(bezierPath);
           currentPathPoints = [];
