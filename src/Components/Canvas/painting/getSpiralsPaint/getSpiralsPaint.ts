@@ -78,7 +78,7 @@ export const getSpiralsPaint = ({
   }
 
   const initialLineWidth = 500; // Half of full size;
-  const stepSize = 16;
+  const stepSize = 8;
   const numberOfDescendants = 2;
   const numberOfPasses = getResolution(resolution);
   const shapeEveryStep = 1;
@@ -104,6 +104,11 @@ export const getSpiralsPaint = ({
         color,
       };
       let currentPathPoints = [];
+      const outOfBoundsVariationRate = Math.random() * 0.6 - 0.3;
+      let initialSegmentCoordinates = {
+        x,
+        y,
+      };
 
       do {
         const spiralGrowingCurve = isDescendants ? 1 : currentSpiralSize / spiralSize;
@@ -124,23 +129,38 @@ export const getSpiralsPaint = ({
 
         baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize);
 
-        if (getIsOutOfBounds({x: newX, y: newY, width, height})) {
+        if (getIsOutOfBounds({x: newX, y: newY, width, height, variationRate: 0})) {
           return;
         }
 
         // draws the spiral from current node
         if (currentSpiralSize % (stepSize * 2) === 0 || currentSpiralSize === 0) {
           currentPathPoints = [];
-          currentPathPoints.push(new Two.Anchor(newX, newY));
+          currentPathPoints.push(new Two.Anchor(descendantValues.x, descendantValues.y));
+          initialSegmentCoordinates.x = descendantValues.x;
+          initialSegmentCoordinates.y = descendantValues.y;
         } else {
-          currentPathPoints.push(new Two.Anchor(newX, newY));
-          const bezierPath = new Two.Path(currentPathPoints, false, true, false);
-          bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
-          bezierPath.closed = false;
-          bezierPath.linewidth = lineWidth / (currentPass * 2);
-          bezierPath.cap = 'round';
-          bezierPath.noFill();
-          canvas.add(bezierPath);
+          // draws circle or not
+          if (Math.random() < 0.9) {
+            currentPathPoints.push(new Two.Anchor(newX, newY));
+            const bezierPath = new Two.Path(currentPathPoints, false, true, false);
+            bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
+            bezierPath.closed = false;
+            // line gets thinner as passes increase
+            bezierPath.linewidth = lineWidth / (currentPass * 2);
+            bezierPath.cap = 'round';
+            bezierPath.noFill();
+            canvas.add(bezierPath);
+          } else {
+            const circle = canvas.makeCircle(
+              (initialSegmentCoordinates.x + newX) / 2,
+              (initialSegmentCoordinates.y + newY) / 2,
+              stepSize * 2
+            );
+            circle.noFill();
+            circle.linewidth = lineWidth / (currentPass * 4);
+            circle.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
+          }
         }
 
         // Update last used values
