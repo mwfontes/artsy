@@ -151,6 +151,16 @@ export const getSpiralsPaint = ({
             bezierPath.cap = 'round';
             bezierPath.noFill();
             canvas.add(bezierPath);
+            if (Math.random() < 0.0075) {
+              const circle = canvas.makeCircle(
+                (initialSegmentCoordinates.x + newX) / 2,
+                (initialSegmentCoordinates.y + newY) / 2,
+                initialLineWidth / 2 / currentPass
+              );
+              circle.noFill();
+              circle.linewidth = lineWidth / (currentPass * 4);
+              circle.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
+            }
           } else {
             const circle = canvas.makeCircle(
               (initialSegmentCoordinates.x + newX) / 2,
