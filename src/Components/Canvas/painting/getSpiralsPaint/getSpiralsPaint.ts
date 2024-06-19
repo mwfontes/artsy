@@ -1,4 +1,5 @@
 import Two from 'two.js';
+import {Shape} from 'two.js/src/shape';
 
 import {getNewSpiralsNode, TSpiralNode} from './getNewSpiralsNode';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
@@ -20,6 +21,7 @@ type TColor = {
   r: number;
   g: number;
   b: number;
+  a: number;
 };
 
 const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, step: number): TColor => {
@@ -43,6 +45,7 @@ const getBaseColor = (node: TSpiralNode, baseContext: CanvasRenderingContext2D, 
     r: newColor[0],
     g: newColor[1],
     b: newColor[2],
+    a: newColor[3],
   };
 };
 
@@ -81,14 +84,15 @@ export const getSpiralsPaint = ({
   const stepSize = 8;
   const numberOfDescendants = 2;
   const numberOfPasses = getResolution(resolution);
-  const shapeEveryStep = 1;
 
   for (let currentPass = 1; currentPass < numberOfPasses + 1; currentPass++) {
+    const shapesGroup: Shape[] = isDescendants ? parentGroup : [];
+    console.log('New group!', currentPass, numberOfPasses);
     const numberOfMainSpirals = numberOfPasses * currentPass;
     // creates nodes based on resolution.
     // 1 resultion point = 1 new node (spiral line)
     const nodes = [...new Array(isDescendants ? numberOfDescendants : numberOfMainSpirals)].map((_newItem) =>
-      getNewSpiralsNode({baseContext, width, height, lineWidth: initialLineWidth, parentNode})
+      getNewSpiralsNode({baseContext, width, height, lineWidth: initialLineWidth, parentNode, shapesGroup})
     );
 
     // for each node, draw the next lines
@@ -129,47 +133,53 @@ export const getSpiralsPaint = ({
 
         baseColor = getBaseColor({...node, ...descendantValues}, baseContext, currentSpiralSize);
 
+        // terminate spiral
         if (getIsOutOfBounds({x: newX, y: newY, width, height, variationRate: 0})) {
           return;
         }
 
-        // draws the spiral from current node
-        if (currentSpiralSize % (stepSize * 2) === 0 || currentSpiralSize === 0) {
-          currentPathPoints = [];
-          currentPathPoints.push(new Two.Anchor(descendantValues.x, descendantValues.y));
-          initialSegmentCoordinates.x = descendantValues.x;
-          initialSegmentCoordinates.y = descendantValues.y;
-        } else {
-          // draws circle or not
-          if (Math.random() < 0.9) {
-            currentPathPoints.push(new Two.Anchor(newX, newY));
-            const bezierPath = new Two.Path(currentPathPoints, false, true, false);
-            bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
-            bezierPath.closed = false;
-            // line gets thinner as passes increase
-            bezierPath.linewidth = lineWidth / (currentPass * 2);
-            bezierPath.cap = 'round';
-            bezierPath.noFill();
-            canvas.add(bezierPath);
-            if (Math.random() < 0.0075) {
+        // do not paint any line because color is transparent
+        if (baseColor.a === 255) {
+          // draws the spiral from current node
+          if (currentSpiralSize % (stepSize * 2) === 0 || currentSpiralSize === 0) {
+            currentPathPoints = [];
+            currentPathPoints.push(new Two.Anchor(descendantValues.x, descendantValues.y));
+            initialSegmentCoordinates.x = descendantValues.x;
+            initialSegmentCoordinates.y = descendantValues.y;
+          } else {
+            // draws circle or not
+            if (Math.random() < 0.9) {
+              currentPathPoints.push(new Two.Anchor(newX, newY));
+              const bezierPath = canvas.makePath(currentPathPoints);
+              bezierPath.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
+              bezierPath.closed = false;
+              // line gets thinner as passes increase
+              bezierPath.linewidth = lineWidth / (currentPass * 2);
+              bezierPath.cap = 'round';
+              bezierPath.noFill();
+              shapesGroup.push(bezierPath);
+              if (Math.random() < 0.0075) {
+                const circle = canvas.makeCircle(
+                  (initialSegmentCoordinates.x + newX) / 2,
+                  (initialSegmentCoordinates.y + newY) / 2,
+                  initialLineWidth / 2 / currentPass
+                );
+                circle.noFill();
+                circle.linewidth = lineWidth / (currentPass * 4);
+                circle.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
+                shapesGroup.push(circle);
+              }
+            } else {
               const circle = canvas.makeCircle(
                 (initialSegmentCoordinates.x + newX) / 2,
                 (initialSegmentCoordinates.y + newY) / 2,
-                initialLineWidth / 2 / currentPass
+                stepSize * 2
               );
               circle.noFill();
               circle.linewidth = lineWidth / (currentPass * 4);
               circle.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
+              shapesGroup.push(circle);
             }
-          } else {
-            const circle = canvas.makeCircle(
-              (initialSegmentCoordinates.x + newX) / 2,
-              (initialSegmentCoordinates.y + newY) / 2,
-              stepSize * 2
-            );
-            circle.noFill();
-            circle.linewidth = lineWidth / (currentPass * 4);
-            circle.stroke = `rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b} )`;
           }
         }
 
@@ -197,6 +207,8 @@ export const getSpiralsPaint = ({
         });
       }
     });
+
+    canvas.makeGroup(shapesGroup);
   }
   canvas.update();
 };

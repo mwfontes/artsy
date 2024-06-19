@@ -25,10 +25,10 @@ function App() {
     loadedImageRef.current = new Image();
     baseCanvasRef.current = document.createElement('canvas');
     baseContextRef.current = baseCanvasRef.current.getContext('2d', {
-      alpha: false,
+      alpha: true,
       desynchronized: true,
       willReadFrequently: false,
-      colorSpace: 'srgb',
+      // colorSpace: 'srgb',
     });
 
     loadedImageRef.current.onload = () => {
@@ -51,9 +51,7 @@ function App() {
 
   return (
     <SettingsContext.Provider value={{resolution, setResolution}}>
-      <div
-        className={cx(styles.component)}
-      >
+      <div className={cx(styles.component)}>
         <Settings onApply={updateOrLoadImage} />
         {isImageLoaded && (
           <Canvas

@@ -1,3 +1,4 @@
+import {Shape} from 'two.js/src/shape';
 import {getBasePixelData} from '../../../../utils/getBasePixelData';
 
 export type TSpiralNode = {
@@ -21,6 +22,7 @@ interface ISpiralNode {
   height: number;
   parentNode?: TSpiralNode;
   lineWidth: number;
+  parentGroup?: Shape[];
 }
 
 export const getNewSpiralsNode = ({baseContext, width, height, parentNode, lineWidth}: ISpiralNode): TSpiralNode => {
