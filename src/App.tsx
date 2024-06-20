@@ -9,17 +9,19 @@ import styles from './App.styles';
 
 function App() {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [isDetail, setIsDetail] = useState(false);
   const loadedImageRef = useRef<HTMLImageElement>();
   const baseCanvasRef = useRef<HTMLCanvasElement>();
   const baseContextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const {resolution, setResolution} = appSettings();
 
-  const updateOrLoadImage = (imageUrl: string) => {
+  const updateOrLoadImage = (imageUrl: string, isDetail: boolean) => {
     if (!imageUrl) {
       return;
     }
 
+    setIsDetail(isDetail);
     setIsImageLoaded(false);
 
     loadedImageRef.current = new Image();
@@ -28,7 +30,6 @@ function App() {
       alpha: true,
       desynchronized: true,
       willReadFrequently: false,
-      // colorSpace: 'srgb',
     });
 
     loadedImageRef.current.onload = () => {
@@ -58,6 +59,7 @@ function App() {
             width={baseCanvasRef.current!.width}
             height={baseCanvasRef.current!.height}
             baseContext={baseContextRef.current!}
+            isDetail={isDetail}
           />
         )}
       </div>
