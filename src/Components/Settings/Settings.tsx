@@ -6,14 +6,14 @@ import {useAppSettings, EResolution} from '../../Providers/AppSettings/AppSettin
 import styles from './Settings.styles';
 
 interface ISettings {
-  onApply(imageUrl: string): void;
+  onApply(imageUrl: string, isDetail: boolean): void;
 }
 
 function Settings({onApply}: ISettings) {
   const {setResolution} = useAppSettings();
   const familiesInputRef = React.useRef<HTMLInputElement>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const typeSelectRef = React.useRef<HTMLSelectElement>(null);
+  const detailRef = React.useRef<HTMLInputElement>(null);
 
   const handleApply = () => {
     if (!fileInputRef.current!.files || fileInputRef.current!.files.length === 0) {
@@ -30,7 +30,7 @@ function Settings({onApply}: ISettings) {
       setResolution([...resolutionRadioEls].find((radio) => radio.checked)!.value as EResolution);
     }
 
-    onApply(imageUrl);
+    onApply(imageUrl, detailRef.current?.checked || false);
   };
 
   const handleDownload = () => {
@@ -57,6 +57,8 @@ function Settings({onApply}: ISettings) {
       <h1>Settings</h1>
       <h3>Image file</h3>
       <input ref={fileInputRef} type="file" className={cx(styles.input)} />
+      <input type="checkbox" id="detail" ref={detailRef} />
+      <label htmlFor="detail">Image detail section</label>
       <section>
         <h3>Artwork resolution</h3>
         <div className={cx(styles.resolutionSelection)} ref={familiesInputRef}>

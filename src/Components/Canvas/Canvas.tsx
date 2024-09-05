@@ -12,9 +12,10 @@ export interface ICanvas {
   width: number;
   height: number;
   baseContext: CanvasRenderingContext2D;
+  isDetail: boolean;
 }
 
-function Canvas({width, height, baseContext}: ICanvas) {
+function Canvas({width, height, baseContext, isDetail}: ICanvas) {
   const {resolution} = useAppSettings();
   const canvas = createRef<HTMLDivElement>();
   const screenRatio = width / height;
@@ -34,6 +35,7 @@ function Canvas({width, height, baseContext}: ICanvas) {
           screenRatio,
           width,
           height,
+          isDetail,
         });
       }, 1);
     }
